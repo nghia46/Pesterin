@@ -1,5 +1,6 @@
 @import "normalize.css";
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+// @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&display=swap');
 
 :root {
   --primary: #e60023;
@@ -27,8 +28,11 @@
   --text-color-black-2nd: #333333;
   --text-color-white: #fff;
   --text-color-gray-1st: #767676;
+  --text-color-gray-2nd: #5f5f5f;
+  --text-color-input-comment: #211922;
 
   --bg-white: #fff;
+  --bg-white-transparent: #ffffffcc;
   --btn-bg-hover: #f0f0f0;
 
   --border-color: #dedede;
@@ -53,4 +57,5 @@ body {
   font-family: "Inter", sans-serif;
   font-size: 1.6rem;
   text-rendering: optimizeSpeed;
+  color: var(--text-color-black);
 }

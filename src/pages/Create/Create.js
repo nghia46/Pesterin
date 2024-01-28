@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import MainHeader from "~/layouts/MainHeader";
 import MoreOptions from "~/components/Create/MoreOptions";
@@ -6,8 +6,10 @@ import styles from "./Create.module.scss";
 const cx = classNames.bind(styles);
 function Create() {
   const fileInputImageRef = useRef();
+  const textareaRef = useRef(null);
 
   const [uploadImagePreview, setUploadImagePreview] = useState(null);
+  const [description, setDescription] = useState("");
   const [isCheckedAds, setIsCheckedAds] = useState(true);
   const [isCheckedComment, setIsCheckedComment] = useState(true);
   const [isCheckedSimilar, setIsCheckedSimilar] = useState(true);
@@ -15,6 +17,23 @@ function Create() {
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [showUploadInformation, setShowUploadInformation] = useState(false);
   const [showPublishBtn, setShowPublishBtn] = useState(false);
+
+  const [textareaRows, setTextareaRows] = useState(1);
+
+  useEffect(() => {
+    // Automatically resize the textarea when the content is changed
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+    // Calculate the number of rows based on scrollHeight and clientHeight
+    const extraLines =
+      (textareaRef.current.scrollHeight - textareaRef.current.clientHeight) /
+      20;
+    const calculatedRows = Math.max(1, Math.ceil(extraLines));
+    setTextareaRows(calculatedRows);
+  }, [description]);
 
   const handleClickUploadImage = () => {
     fileInputImageRef.current.click();
@@ -39,6 +58,10 @@ function Create() {
     setUploadImagePreview(null);
     setShowUploadInformation(false);
     setShowPublishBtn(false);
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value);
   };
 
   const handlePublishPin = () => {};
@@ -167,6 +190,11 @@ function Create() {
                     <textarea
                       className={cx("input")}
                       placeholder="Add a detailed description"
+                      onChange={handleDescriptionChange}
+                      value={description}
+                      rows={textareaRows}
+                      ref={textareaRef}
+                      autoFocus={true}
                     ></textarea>
                   </div>
                 </div>
