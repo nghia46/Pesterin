@@ -102,10 +102,15 @@
         flex-direction: column;
         padding: 0 4px;
         .creator-name {
+          text-decoration: none;
           height: 19px;
           font-size: 14px;
           font-weight: 600;
-          color: var(--text-color-black);
+          color: var(--text-color-black); 
+
+          &:hover {
+            text-decoration: underline;
+          }
         }
 
         .followers {

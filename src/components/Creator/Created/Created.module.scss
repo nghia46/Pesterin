@@ -1,0 +1,19 @@
+.create-content-artwork-container {
+  width: 100%;
+  padding-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .create-content-artwork-list {
+    width: calc(100% - 150px);
+    column-count: 7;
+  }
+
+  @media screen and (max-width: 1600px) {
+    .create-content-artwork-list {
+      width: calc(100% - 150px);
+      column-count: 6;
+    }
+  }
+}

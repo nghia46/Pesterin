@@ -1,13 +1,12 @@
 import classNames from "classnames/bind";
-
-import Top from "./Top";
-import Middle from "./Middle";
 import Bottom from "./Bottom";
+import Middle from "./Middle";
+import Top from "./Top";
 
 import styles from "./PinDetail.module.scss";
 const cx = classNames.bind(styles);
 
-function PinDetail() {
+function PinDetail({ setShowReportPin }) {
   return (
     <div className={cx("pin-detail")}>
       {/* Image */}
@@ -21,7 +20,7 @@ function PinDetail() {
       {/* Content */}
       <div className={cx("pin-detail-information")}>
         {/* Top */}
-        <Top />
+        <Top setShowReportPin={setShowReportPin} />
         {/* Middle */}
         <Middle />
         {/* Bottom */}

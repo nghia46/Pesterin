@@ -19,4 +19,12 @@
     height: 100%;
     column-count: 7;
   }
+
+  @media screen and (max-width: 1600px) {
+    .related-art-container {
+      width: 100%;
+      margin: 0 8px;
+      column-count: 6;
+    }
+  }
 }

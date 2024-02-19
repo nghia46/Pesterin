@@ -24,7 +24,64 @@
     }
 
     .reaction-container {
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .number-of-reactions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .list-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .icon-love {
+            cursor: pointer;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            z-index: 2;
+          }
+
+          .icon-haha {
+            cursor: pointer;
+            margin-left: -5px;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+            z-index: 1;
+          }
+
+          .icon-wow {
+            cursor: pointer;
+            margin-left: -5px;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            border: 1.5px solid #fff;
+          }
+        }
+        .number {
+          cursor: pointer;
+          width: fit-content;
+          font-size: 15px;
+          font-weight: 500;
+          padding: 0 4px 0 8px;
+          color: var(--text-color-black);
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
       .interact-react {
+        position: relative;
         cursor: pointer;
         width: 48px;
         height: 48px;
@@ -32,11 +89,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-
-        .icon {
-          font-size: 24px;
-          color: var(--text-color-black);
-        }
       }
     }
   }
@@ -72,6 +124,8 @@
       .input {
         width: 83%;
         height: fit-content;
+        min-height: calc(56px - 32px);
+        max-height: calc(150px - 32px);
         resize: none;
         border: none;
         outline: none;

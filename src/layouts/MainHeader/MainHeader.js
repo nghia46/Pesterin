@@ -1,7 +1,8 @@
-import React from "react";
 import classNames from "classnames/bind";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "~/assets/images/logo.png";
+import AccountOptions from "~/components/AccountOptions";
 import styles from "./MainHeader.module.scss";
 const cx = classNames.bind(styles);
 const headerNav = [
@@ -19,11 +20,15 @@ const headerNav = [
 function MainHeader() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showAccountSetting, setShowAccountSetting] = useState(false);
+
   const handleNavItemClick = (path) => {
     navigate(path);
   };
   return (
     <div className={cx("main-header-wrapper")}>
+      {showAccountSetting && <AccountOptions />}
+
       <div className={cx("main-header-container")}>
         <div className={cx("header-left")}>
           <Link to="/" className={cx("header-logo")}>
@@ -62,10 +67,13 @@ function MainHeader() {
           <div className={cx("message")}>
             <i className={cx("fa-solid fa-comment-dots", "icon")}></i>
           </div>
-          <div className={cx("user-image")}>
+          <Link to="/profile" className={cx("user-image")}>
             <img src={Logo} alt="user-img" className={cx("image")} />
-          </div>
-          <div className={cx("dropdown")}>
+          </Link>
+          <div
+            className={cx("dropdown")}
+            onClick={() => setShowAccountSetting(!showAccountSetting)}
+          >
             <i className={cx("fa-solid fa-chevron-down", "icon")}></i>
           </div>
         </div>
