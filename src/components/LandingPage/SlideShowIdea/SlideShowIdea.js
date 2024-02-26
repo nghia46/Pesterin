@@ -9,7 +9,7 @@ function SlideShowIdea() {
       <div className={cx("content")}>
         <div className={cx("main-text")}>Get your own ideas</div>
         <div className={cx("explore")}>
-          <buttons className={cx("explore-btn")}>Explore</buttons>
+          <button className={cx("explore-btn")}>Explore</button>
         </div>
       </div>
       <div className={cx("images-layout")}>

@@ -257,8 +257,8 @@
           justify-content: center;
           background-color: var(--button-bg-secondary);
 
-          .copy-link-image {
-            font-size: 24px;
+          .icon {
+            font-size: 16px;
             color: var(--text-color-black);
           }
 
@@ -292,13 +292,9 @@
           justify-content: center;
           background-color: var(--button-bg-secondary);
 
-          .email-image {
-            font-size: 24px;
+          .icon {
+            font-size: 20px;
             color: var(--text-color-black);
-          }
-
-          &:hover {
-            background-color: var(--button-bg-secondary-hover);
           }
         }
 

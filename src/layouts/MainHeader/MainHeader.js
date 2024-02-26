@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "~/assets/images/logo.png";
 import AccountOptions from "~/components/AccountOptions";
+import Notifications from "~/components/Notifications";
 import styles from "./MainHeader.module.scss";
 const cx = classNames.bind(styles);
 const headerNav = [
@@ -21,14 +22,14 @@ function MainHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const [showAccountSetting, setShowAccountSetting] = useState(false);
-
+  const [showNotifications, setShowNotifications] = useState(false);
   const handleNavItemClick = (path) => {
     navigate(path);
   };
   return (
     <div className={cx("main-header-wrapper")}>
       {showAccountSetting && <AccountOptions />}
-
+      {showNotifications && <Notifications />}
       <div className={cx("main-header-container")}>
         <div className={cx("header-left")}>
           <Link to="/" className={cx("header-logo")}>
@@ -61,7 +62,10 @@ function MainHeader() {
           </div>
         </div>
         <div className={cx("header-right")}>
-          <div className={cx("notification")}>
+          <div
+            className={cx("notification")}
+            onClick={() => setShowNotifications(!showNotifications)}
+          >
             <i className={cx("fa-sharp fa-solid fa-bell", "icon")}></i>
           </div>
           <div className={cx("message")}>

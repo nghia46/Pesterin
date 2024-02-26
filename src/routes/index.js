@@ -4,7 +4,7 @@ import Create from "~/pages/Create";
 import Pin from "~/pages/Pin";
 import Profile from "~/pages/Profile";
 import Creator from "~/pages/Creator";
-import EditProfile from "~/components/Profile/EditProfile";
+import Notifications from "~/components/Notifications";
 const publicRoutes = [
   { path: "/", component: Container },
   { path: "/ideas", component: Explore },
@@ -12,7 +12,7 @@ const publicRoutes = [
   { path: "/pin", component: Pin },
   { path: "/profile", component: Profile },
   { path: "/creator", component: Creator },
-  { path: "/page", component: EditProfile },
+  { path: "/page", component: Notifications },
 ];
 
 export { publicRoutes };

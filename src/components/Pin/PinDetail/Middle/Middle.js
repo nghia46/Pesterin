@@ -49,7 +49,7 @@ function Middle() {
             <img src={Logo} alt="avatar" className={cx("avatar")} />
           </div>
           <div className={cx("creator-detail")}>
-            <Link to="" className={cx("creator-name")}>
+            <Link to="/creator" className={cx("creator-name")}>
               Displate - prints on metal{" "}
             </Link>
             <div className={cx("followers")}>1.3M followers</div>

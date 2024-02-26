@@ -6,7 +6,7 @@ import styles from "./SharingPin.module.scss";
 const cx = classNames.bind(styles);
 function SharingPin() {
   return (
-    <div className={cx("sharing-wrapper")}>
+    <div className={cx("sharing-wrapper")} onClick={(e) => e.stopPropagation()}>
       <div className={cx("sharing-container")}>
         <div className={cx("send-heading")}>Send on Pesterin</div>
         <div className={cx("send-options")}>

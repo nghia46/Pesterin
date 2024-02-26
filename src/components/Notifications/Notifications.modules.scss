@@ -1,0 +1,23 @@
+.notification-wrapper {
+  position: absolute;
+  right: 0;
+  top: 67px;
+  width: 375px;
+  height: 670px;
+  border-radius: 15px;
+  background-color: var(--bg-white);
+
+  .notification-container {
+    width: 100%;
+    .notification-heading {
+      width: 100%;
+      padding: 24px 0;
+      .text {
+        text-align: center;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-color-black);
+      }
+    }
+  }
+}

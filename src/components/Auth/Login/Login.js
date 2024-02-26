@@ -1,15 +1,60 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+
+import api from "~/services/apiService";
+import { useAuth } from "~/contexts/AuthContext";
+
 import Logo from "~/assets/images/logo.png";
 import googleIcon from "~/assets/images/googleIcon.png";
 import styles from "./Login.module.scss";
 const cx = classNames.bind(styles);
 function Login({ setShowLogin, setShowSignup }) {
+  const { login } = useAuth();
+  const [user, setUser] = useState(null);
+
+  const loginGoogle = useGoogleLogin({
+    onSuccess: (codeResponse) => {
+      setUser(codeResponse);
+    },
+    onError: (error) => console.log("Login Failed:", error),
+  });
+
+  useEffect(() => {
+    if (user) {
+      axios
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.access_token}`,
+              Accept: "application/json",
+            },
+          }
+        )
+        .then((res) => {
+          const userData = res.data;
+          api
+            .post("/auth/google", userData)
+            .then((response) => {
+              // login();
+              console.log(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [login, user]);
+
   const handleClickSignup = () => {
     setShowLogin(false);
     setShowSignup(true);
   };
+
   return (
     <div className={cx("login-wrapper")}>
       <div className={cx("login-container")}>
@@ -67,7 +112,10 @@ function Login({ setShowLogin, setShowSignup }) {
             </div>
             <div className={cx("or")}>OR</div>
             {/* Login google */}
-            <div className={cx("login-google-action")}>
+            <div
+              className={cx("login-google-action")}
+              onClick={() => loginGoogle()}
+            >
               <button className={cx("login-google-btn")}>
                 <img
                   src={googleIcon}

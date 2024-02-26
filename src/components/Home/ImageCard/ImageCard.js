@@ -1,9 +1,14 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import classNames from "classnames/bind";
+import { useNavigate } from "react-router-dom";
 import styles from "./ImageCard.module.scss";
 const cx = classNames.bind(styles);
 function ImageCard({ image }) {
+  const navigate = useNavigate();
+
+  const handleClickImageCard = () => {
+    navigate("/pin");
+  };
+
   return (
     <div className={cx("image-card")}>
       <img
@@ -12,12 +17,12 @@ function ImageCard({ image }) {
         alt={`Artwork img`}
         className={cx("image-item")}
       />
-      <Link to="/pin" className={cx("image-card-label")}>
-        <div className={cx("save-action")}>
+      <div className={cx("image-card-label")} onClick={handleClickImageCard}>
+        <div className={cx("save-action")} onClick={(e) => e.stopPropagation()}>
           <button className={cx("save-btn")}>Save</button>
         </div>
         <div className={cx("interact-action")}>
-          <div className={cx("sharing")}>
+          <div className={cx("sharing")} onClick={(e) => e.stopPropagation()}>
             <i
               className={cx(
                 "fa-sharp fa-solid fa-arrow-up-from-bracket",
@@ -25,7 +30,10 @@ function ImageCard({ image }) {
               )}
             ></i>
           </div>
-          <div className={cx("more-options")}>
+          <div
+            className={cx("more-options")}
+            onClick={(e) => e.stopPropagation()}
+          >
             <i
               className={cx(
                 "fa-solid fa-ellipsis-vertical fa-rotate-90",
@@ -34,7 +42,7 @@ function ImageCard({ image }) {
             ></i>
           </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 }

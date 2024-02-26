@@ -1,8 +1,9 @@
 import React from "react";
 import classNames from "classnames/bind";
+import { Link } from "react-router-dom";
+import { useAuth } from "~/contexts/AuthContext";
 import Logo from "~/assets/images/logo.png";
 import styles from "./AccountOptions.module.scss";
-import { Link } from "react-router-dom";
 const cx = classNames.bind(styles);
 const yourAccount = [
   { id: 1, text: "Add account", path: "/add-account" },
@@ -61,6 +62,11 @@ const moreOptions = [
   },
 ];
 function AccountOptions() {
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
   return (
     <div className={cx("account-options-wrapper")}>
       <div className={cx("account-options-container")}>
@@ -110,7 +116,7 @@ function AccountOptions() {
             )}
           </Link>
         ))}
-        <div className={cx("log-out-wrapper")}>
+        <div className={cx("log-out-wrapper")} onClick={handleLogout}>
           <div className={cx("log-out-text")}>Log out</div>
         </div>
       </div>
