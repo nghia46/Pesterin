@@ -7,10 +7,10 @@ import { artworks } from "~/datas/artworkDatas";
 import styles from "./Home.module.scss";
 const cx = classNames.bind(styles);
 
-function Home() {
+function Home({ onLogout }) {
   return (
     <div className={cx("home-wrapper")}>
-      <MainHeader />
+      <MainHeader onLogout={onLogout} />
       <div className={cx("home-container")}>
         <div className={cx("show-artworks-list")}>
           {artworks.map((image, index) => (

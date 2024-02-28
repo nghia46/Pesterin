@@ -1,10 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import className from "classnames/bind";
+import { formatDate } from "~/utils/formatDate";
 import Logo from "~/assets/images/logo.png";
 import googleIcon from "~/assets/images/googleIcon.png";
 import styles from "./Signup.module.scss";
+import api from "~/services/apiService";
 const cx = className.bind(styles);
 function Signup({ setShowSignup, setShowLogin, setShowSignupBusiness }) {
+  const [userData, setUserData] = useState({
+    email: null,
+    password: null,
+    dob: null,
+  });
+
+  const handleChangeEmail = (e) => {
+    setUserData({ ...userData, email: e.target.value });
+  };
+
+  const handleChangePassword = (e) => {
+    setUserData({ ...userData, password: e.target.value });
+  };
+
+  const handleChangeDob = (e) => {
+    const rawDateValue = e.target.value;
+    const formattedDate = formatDate(rawDateValue);
+    setUserData({ ...userData, dob: formattedDate });
+  };
+
+  const handleSignUp = () => {
+    api
+      .post("/auth/signup", userData)
+      .then((response) => {
+        setShowLogin(true);
+        // console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handleClickLogin = () => {
     setShowSignup(false);
     setShowLogin(true);
@@ -50,6 +84,7 @@ function Signup({ setShowSignup, setShowLogin, setShowSignupBusiness }) {
                       spellCheck={false}
                       autoFocus={true}
                       className={cx("input")}
+                      onChange={handleChangeEmail}
                     />
                   </div>
                 </div>
@@ -62,6 +97,7 @@ function Signup({ setShowSignup, setShowLogin, setShowSignupBusiness }) {
                       placeholder="Password"
                       spellCheck={false}
                       className={cx("input")}
+                      onChange={handleChangePassword}
                     />
                   </div>
                 </div>
@@ -74,12 +110,15 @@ function Signup({ setShowSignup, setShowLogin, setShowSignupBusiness }) {
                       placeholder="Birthday"
                       pattern="\d{2}/\d{2}/\d{4}"
                       className={cx("input")}
+                      onChange={handleChangeDob}
                     />
                   </div>
                 </div>
                 {/* Signup button */}
                 <div className={cx("signup-btn")}>
-                  <button className={cx("btn")}>Continue</button>
+                  <button className={cx("btn")} onClick={handleSignUp}>
+                    Continue
+                  </button>
                 </div>
               </div>
               <div className={cx("or")}>OR</div>

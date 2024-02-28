@@ -1,46 +1,65 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
+import { AuthContext } from "~/contexts/AuthContext";
+
 import MainHeader from "~/layouts/MainHeader";
 import Saved from "~/components/Profile/Saved";
 import Created from "~/components/Profile/Created";
 import EditProfile from "~/components/Profile/EditProfile";
-import logo from "~/assets/images/logo.png";
+import LoadingSpinner from "~/components/LoadingSpinner";
+
+import UserDefaultImg from "~/assets/images/user-default.png";
 import styles from "./Profile.module.scss";
 const cx = classNames.bind(styles);
-function Profile() {
+function Profile({ onLogout }) {
+  const { userData } = useContext(AuthContext);
   const [showContent, setShowContent] = useState("Saved");
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [loading, setLoading] = useState(false);
   return (
     <>
+      {loading && <LoadingSpinner loading={loading} />}
       {showEditProfile && (
-        <EditProfile setShowEditProfile={setShowEditProfile} />
+        <EditProfile
+          setShowEditProfile={setShowEditProfile}
+          setLoading={setLoading}
+        />
       )}
       <div className={cx("profile-wrapper")}>
-        <MainHeader />
+        <MainHeader onLogout={onLogout} />
         <div className={cx("profile-container")}>
           {/* Profile */}
           <div className={cx("user-information-wrapper")}>
             <div className={cx("user-information-container")}>
               <div className={cx("user-avatar")}>
-                <img src={logo} alt="avatar" className={cx("avatar")} />
+                <img
+                  src={userData.avatar ? userData.avatar : UserDefaultImg}
+                  alt="avatar"
+                  className={cx("avatar")}
+                />
               </div>
               <div className={cx("full-name")}>
-                <div className={cx("text")}>Le Vu Dinh</div>
+                <div className={cx("text")}>
+                  {userData.firstName + " " + userData.lastName}
+                </div>
               </div>
               <div className={cx("user-name")}>
                 <i className={cx("fa-brands fa-pinterest", "icon")}></i>
-                <div className={cx("text")}>duyk16_hcm</div>
+                <div className={cx("text")}>{userData.userName}</div>
               </div>
-              <div className={cx("about")}>
-                <div className={cx("text")}>Hi, I'm dev</div>
-              </div>
-              <Link
-                to="https://www.facebook.com/leevuxx"
-                className={cx("profile-link")}
-              >
-                facebook.com/leevuxx
-              </Link>
+              {userData.about && (
+                <div className={cx("about")}>
+                  <div className={cx("text")}>{userData.about}</div>
+                </div>
+              )}
+
+              {userData.website && (
+                <Link to={userData.website} className={cx("profile-link")}>
+                  {userData.website.split("/").slice(0, 3).join("/")}
+                </Link>
+              )}
+
               <div className={cx("following")}>
                 <span className={cx("number")}>1000</span>
                 <span className={cx("text")}>following</span>

@@ -1,4 +1,5 @@
-import Container from "~/layouts/Container";
+import Home from "~/pages/Home";
+import LandingPage from "~/pages/LandingPage";
 import Explore from "~/pages/Explore";
 import Create from "~/pages/Create";
 import Pin from "~/pages/Pin";
@@ -6,7 +7,8 @@ import Profile from "~/pages/Profile";
 import Creator from "~/pages/Creator";
 import Notifications from "~/components/Notifications";
 const publicRoutes = [
-  { path: "/", component: Container },
+  { path: "/", component: Home },
+  { path: "/", component: LandingPage },
   { path: "/ideas", component: Explore },
   { path: "/pin-creation-tool", component: Create },
   { path: "/pin", component: Pin },

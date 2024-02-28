@@ -12,14 +12,18 @@ import SignupBusiness from "~/components/Auth/SignupBusiness";
 import styles from "./LandingPage.module.scss";
 const cx = classNames.bind(styles);
 
-function Home() {
+function LandingPage({ onLogin }) {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showSignupBusiness, setShowSignupBusiness] = useState(false);
   return (
     <>
       {showLogin && (
-        <Login setShowLogin={setShowLogin} setShowSignup={setShowSignup} />
+        <Login
+          setShowLogin={setShowLogin}
+          setShowSignup={setShowSignup}
+          onLogin={onLogin}
+        />
       )}
       {showSignup && (
         <Signup
@@ -59,4 +63,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default LandingPage;

@@ -1,7 +1,13 @@
 import axios from "axios";
 import TokenService from "./tokenService";
 
-const excludedRoutes = ["/auth/login", "/auth/signup", "/auth/google"];
+const excludedRoutes = [
+  "/auth/login",
+  "/auth/signup",
+  "/auth/google",
+  "/auth/token",
+  "/auth/logout",
+];
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,

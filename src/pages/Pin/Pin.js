@@ -8,7 +8,7 @@ import ReportPin from "~/components/Pin/PinDetail/Top/MoreOptionsPin/ReportPin";
 import styles from "./Pin.module.scss";
 
 const cx = classNames.bind(styles);
-function Pin() {
+function Pin({ onLogout }) {
   const location = useLocation();
   const [showReportPin, setShowReportPin] = useState(false);
   useEffect(() => {
@@ -18,7 +18,7 @@ function Pin() {
     <>
       {showReportPin && <ReportPin setShowReportPin={setShowReportPin} />}
       <div className={cx("pin-wrapper")}>
-        <MainHeader />
+        <MainHeader onLogout={onLogout} />
         <div className={cx("pin-container")}>
           <div className={cx("pin-content-main")}>
             <PinDetail setShowReportPin={setShowReportPin} />

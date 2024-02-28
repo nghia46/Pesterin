@@ -4,7 +4,7 @@ import MainHeader from "~/layouts/MainHeader";
 import MoreOptions from "~/components/Create/MoreOptions";
 import styles from "./Create.module.scss";
 const cx = classNames.bind(styles);
-function Create() {
+function Create({ onLogout }) {
   const fileInputImageRef = useRef();
   const textareaRef = useRef(null);
 
@@ -71,7 +71,7 @@ function Create() {
   };
   return (
     <div className={cx("create-wrapper")}>
-      <MainHeader />
+      <MainHeader onLogout={onLogout} />
       <div className={cx("create-container")}>
         <div className={cx("create-nav")}>
           <div className={cx("open")}>

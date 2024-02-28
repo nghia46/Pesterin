@@ -1,16 +1,85 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 import { publicRoutes } from "~/routes";
 import { AuthProvider } from "./contexts/AuthContext";
+import Home from "./pages/Home";
+import LandingPage from "./pages/LandingPage";
+import Explore from "./pages/Explore";
 function App() {
+  const [isLoggedIn, setLoggedIn] = useState(() => {
+    const storedValue = localStorage.getItem("isLoggedIn");
+    return storedValue ? JSON.parse(storedValue) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem("isLoggedIn", JSON.stringify(isLoggedIn));
+  }, [isLoggedIn]);
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setLoggedIn(false);
+    localStorage.removeItem("isLoggedIn");
+  };
+
   return (
     <AuthProvider>
       <Router>
         <div className="App">
           <Routes>
-            {/* <Route path="*" element={<NotFound />} /> */}
             {publicRoutes.map((route, index) => {
               let Page = route.component;
-              return <Route key={index} path={route.path} element={<Page />} />;
+
+              if (route.path === "/") {
+                return (
+                  <Route
+                    key={index}
+                    path={route.path}
+                    element={
+                      isLoggedIn ? (
+                        <Home onLogout={handleLogout} />
+                      ) : (
+                        <LandingPage onLogin={handleLogin} />
+                      )
+                    }
+                  />
+                );
+              } else if (route.path === "/ideas") {
+                return (
+                  <Route
+                    key={index}
+                    path={route.path}
+                    element={
+                      isLoggedIn ? (
+                        <Home onLogout={handleLogout} />
+                      ) : (
+                        <Explore onLogin={handleLogin} />
+                      )
+                    }
+                  />
+                );
+              }
+
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    isLoggedIn ? (
+                      <Page onLogout={handleLogout} />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
+                />
+              );
             })}
           </Routes>
         </div>

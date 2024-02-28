@@ -9,7 +9,7 @@ import { categories } from "~/datas/categoriesDatas";
 import { images } from "~/datas/imageDatas";
 import styles from "./Explore.module.scss";
 const cx = classNames.bind(styles);
-function Explore() {
+function Explore({ onLogin }) {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [showSignupBusiness, setShowSignupBusiness] = useState(false);
@@ -17,7 +17,11 @@ function Explore() {
   return (
     <>
       {showLogin && (
-        <Login setShowLogin={setShowLogin} setShowSignup={setShowSignup} />
+        <Login
+          setShowLogin={setShowLogin}
+          setShowSignup={setShowSignup}
+          onLogin={onLogin}
+        />
       )}
       {showSignup && (
         <Signup

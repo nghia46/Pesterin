@@ -9,7 +9,7 @@ import SharingPin from "~/components/Pin/PinDetail/Top/SharingPin";
 import ProfileOptions from "~/components/Creator/ProfileOptions";
 import ReportAccount from "~/components/Creator/ProfileOptions/ReportAccount";
 const cx = classNames.bind(styles);
-function Creator() {
+function Creator({ onLogout }) {
   const [showContent, setShowContent] = useState("Created");
   const [showSharing, setShowSharing] = useState(false);
   const [showProfileOptions, setShowProfileOptions] = useState(false);
@@ -20,7 +20,7 @@ function Creator() {
         <ReportAccount setShowReportProfile={setShowReportProfile} />
       )}
       <div className={cx("creator-wrapper")}>
-        <MainHeader />
+        <MainHeader onLogout={onLogout} />
         <div className={cx("creator-container")}>
           <div className={cx("creator-information-wrapper")}>
             <div className={cx("creator-information-container")}>

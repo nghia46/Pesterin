@@ -1,20 +1,30 @@
-import React, { createContext, useContext, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
+import api from "~/services/apiService";
+import { decryptUserId } from "~/utils/hashUserId";
 
 const AuthContext = createContext();
 
 const initialState = {
-  isAuthenticated: false,
+  userData: {},
+  userId: localStorage.getItem("userId"),
 };
 
 const authReducer = (state, action) => {
   switch (action.type) {
-    case "LOGIN":
+    case "SET_USER_DATA":
       return {
-        isAuthenticated: true,
+        ...state,
+        userData: action.payload,
+      };
+    case "SET_USER_ID":
+      return {
+        ...state,
+        userId: action.payload,
       };
     case "LOGOUT":
       return {
-        isAuthenticated: false,
+        ...state,
+        userId: null,
       };
     default:
       return state;
@@ -24,22 +34,57 @@ const authReducer = (state, action) => {
 const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  const login = () => dispatch({ type: "LOGIN" });
-  const logout = () => dispatch({ type: "LOGOUT" });
+  const setUserData = (data) => {
+    dispatch({ type: "SET_USER_DATA", payload: data });
+  };
+
+  const setUserId = (userId) => {
+    dispatch({ type: "SET_USER_ID", payload: userId });
+    localStorage.setItem("userId", userId);
+  };
+
+  const logout = () => {
+    dispatch({ type: "LOGOUT" });
+    localStorage.removeItem("userId");
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (state.userId) {
+          const decodeUserId = decryptUserId(
+            state.userId,
+            process.env.REACT_APP_SECRET_KEY_ENCODE
+          );
+
+          await api
+            .get(`/user/getUserById/${decodeUserId}`)
+            .then((response) => {
+              setUserData(response.data);
+            });
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchData();
+  }, [state.userId]);
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        ...state,
+        userData: state.userData,
+        setUserData,
+        userId: state.userId,
+        setUserId,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
-
-export { AuthProvider, useAuth };
+export { AuthContext, AuthProvider };

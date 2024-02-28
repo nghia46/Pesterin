@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
-import { useAuth } from "~/contexts/AuthContext";
-import Logo from "~/assets/images/logo.png";
+import { AuthContext } from "~/contexts/AuthContext";
+import UserDefaultImg from "~/assets/images/user-default.png";
 import styles from "./AccountOptions.module.scss";
+import TokenService from "~/services/tokenService";
+import api from "~/services/apiService";
 const cx = classNames.bind(styles);
 const yourAccount = [
   { id: 1, text: "Add account", path: "/add-account" },
@@ -61,11 +63,22 @@ const moreOptions = [
     icon: true,
   },
 ];
-function AccountOptions() {
-  const { logout } = useAuth();
+function AccountOptions({ onLogout }) {
+  const { userData, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
-    logout();
+    const refreshToken = TokenService.getRefreshToken();
+
+    api
+      .post("/auth/logout", { refreshToken })
+      .then((res) => {
+        TokenService.removeTokens();
+        logout();
+        onLogout();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <div className={cx("account-options-wrapper")}>
@@ -76,12 +89,18 @@ function AccountOptions() {
           <div className={cx("user-info-container")}>
             <div className={cx("user-info-main")}>
               <div className={cx("user-avatar")}>
-                <img src={Logo} alt="avatar" className={cx("avatar")} />
+                <img
+                  src={userData.avatar ? userData.avatar : UserDefaultImg}
+                  alt="avatar"
+                  className={cx("avatar")}
+                />
               </div>
               <div className={cx("user-info")}>
-                <div className={cx("username")}>Le Vu Dinh Duy</div>
-                <div className={cx("account-type")}>Personal</div>
-                <div className={cx("email")}>duylvdse160367@fpt.edu.vn</div>
+                <div className={cx("username")}>
+                  {userData.firstName + " " + userData.lastName.split(" ")[0]}
+                </div>
+                <div className={cx("account-type")}>{userData.type}</div>
+                <div className={cx("email")}>{userData.email}</div>
               </div>
             </div>
             <div className={cx("tick")}>

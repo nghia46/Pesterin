@@ -1,9 +1,14 @@
 import classNames from "classnames/bind";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+
+import { AuthContext } from "~/contexts/AuthContext";
+
 import Logo from "~/assets/images/logo.png";
+import UserDefaultImg from "~/assets/images/user-default.png";
 import AccountOptions from "~/components/AccountOptions";
 import Notifications from "~/components/Notifications";
+
 import styles from "./MainHeader.module.scss";
 const cx = classNames.bind(styles);
 const headerNav = [
@@ -18,17 +23,19 @@ const headerNav = [
     path: "/pin-creation-tool",
   },
 ];
-function MainHeader() {
+function MainHeader({ onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { userData } = useContext(AuthContext);
   const [showAccountSetting, setShowAccountSetting] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
   const handleNavItemClick = (path) => {
     navigate(path);
   };
   return (
     <div className={cx("main-header-wrapper")}>
-      {showAccountSetting && <AccountOptions />}
+      {showAccountSetting && <AccountOptions onLogout={onLogout} />}
       {showNotifications && <Notifications />}
       <div className={cx("main-header-container")}>
         <div className={cx("header-left")}>
@@ -72,7 +79,11 @@ function MainHeader() {
             <i className={cx("fa-solid fa-comment-dots", "icon")}></i>
           </div>
           <Link to="/profile" className={cx("user-image")}>
-            <img src={Logo} alt="user-img" className={cx("image")} />
+            <img
+              src={userData.avatar ? userData.avatar : UserDefaultImg}
+              alt="user-img"
+              className={cx("image")}
+            />
           </Link>
           <div
             className={cx("dropdown")}
