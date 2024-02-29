@@ -5,11 +5,15 @@ import {
   BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { publicRoutes } from "~/routes";
 import { AuthProvider } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 import LandingPage from "./pages/LandingPage";
 import Explore from "./pages/Explore";
+
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(() => {
     const storedValue = localStorage.getItem("isLoggedIn");
@@ -33,6 +37,7 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
+          <ToastContainer />
           <Routes>
             {publicRoutes.map((route, index) => {
               let Page = route.component;

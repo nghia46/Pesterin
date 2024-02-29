@@ -1,24 +1,78 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { storage } from "~/configs/firebase";
+import { v4 } from "uuid";
+import axios from "axios";
+import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { AuthContext } from "~/contexts/AuthContext";
+import useDebounce from "~/hooks/useDebounce";
+import api from "~/services/apiService";
+
 import MainHeader from "~/layouts/MainHeader";
 import MoreOptions from "~/components/Create/MoreOptions";
+import SearchTag from "~/components/Create/SearchTag";
+
 import styles from "./Create.module.scss";
+
 const cx = classNames.bind(styles);
 function Create({ onLogout }) {
+  const { userData } = useContext(AuthContext);
   const fileInputImageRef = useRef();
   const textareaRef = useRef(null);
 
-  const [uploadImagePreview, setUploadImagePreview] = useState(null);
-  const [description, setDescription] = useState("");
-  const [isCheckedAds, setIsCheckedAds] = useState(true);
-  const [isCheckedComment, setIsCheckedComment] = useState(true);
-  const [isCheckedSimilar, setIsCheckedSimilar] = useState(true);
+  const [artWorkData, setArtWorkData] = useState({
+    url: "",
+    title: "",
+    description: "",
+    link: "",
+    isCheckedAds: true,
+    isCheckedComment: true,
+    isCheckedSimilar: true,
+  });
 
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [uploadImagePreview, setUploadImagePreview] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchTagValue, setSearchTagValue] = useState("");
+  const [searchTagResult, setSearchTagResult] = useState([]);
+
+  const [showMoreOptions, setShowMoreOptions] = useState(true);
   const [showUploadInformation, setShowUploadInformation] = useState(false);
   const [showPublishBtn, setShowPublishBtn] = useState(false);
-
+  const [showSearchTag, setShowSearchTag] = useState(false);
+  const [loadingUploadImage, setLoadingUploadImage] = useState(false);
+  const [loadingPublish, setLoadingPublish] = useState(false);
   const [textareaRows, setTextareaRows] = useState(1);
+
+  const debouncedValue = useDebounce(searchTagValue, 300);
+
+  useEffect(() => {
+    if (!debouncedValue.trim()) {
+      setSearchTagResult([]);
+      return;
+    }
+
+    const fetchAPI = async () => {
+      api
+        .get(`/category/search/${debouncedValue}`)
+        .then((response) => {
+          setShowSearchTag(true);
+          setSearchTagResult(response.data);
+        })
+        .catch((error) => {
+          console.log(error.response.data.message);
+        });
+    };
+    fetchAPI();
+  }, [debouncedValue]);
 
   useEffect(() => {
     // Automatically resize the textarea when the content is changed
@@ -33,38 +87,166 @@ function Create({ onLogout }) {
       20;
     const calculatedRows = Math.max(1, Math.ceil(extraLines));
     setTextareaRows(calculatedRows);
-  }, [description]);
+  }, [artWorkData.description]);
 
   const handleClickUploadImage = () => {
     fileInputImageRef.current.click();
   };
 
   const handleChangeUploadImage = async (e) => {
+    setLoadingUploadImage(true);
     let file = null;
+    let url;
 
-    //Preview Image
-    file = e.target.files[0];
+    if (e.target.files.length === 1) {
+      file = e.target.files[0];
+      url = URL.createObjectURL(file);
 
-    const url = URL.createObjectURL(file);
-    if (uploadImagePreview) {
-      URL.revokeObjectURL(uploadImagePreview);
+      if (uploadImagePreview) {
+        URL.revokeObjectURL(uploadImagePreview);
+      }
+
+      setUploadImagePreview(url);
+      //Moderation Art
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("key", "ae8e0d930c8fc3f3bf9773d0ea19affd");
+
+        const response = await axios.post(
+          "https://api.moderatecontent.com/moderate/",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const moderateContent = response.data.predictions;
+        if (moderateContent.adult > 40) {
+          setLoadingUploadImage(false);
+          setUploadImagePreview(null);
+
+          // Show Toastify notification
+          toast.error("Artwork censors invalid content", {
+            position: "top-right",
+            autoClose: 1500,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        } else {
+          //Upload User Art to Firebase
+          const userAvatarRef = ref(
+            storage,
+            `artWork/${userData._id}/${file.name + v4()}`
+          );
+          try {
+            await uploadBytes(userAvatarRef, file);
+            const downloadURL = await getDownloadURL(userAvatarRef);
+            // console.log(moderateContent);
+            setArtWorkData({ ...artWorkData, url: downloadURL });
+            setLoadingUploadImage(false);
+            setShowUploadInformation(true);
+            setShowPublishBtn(true);
+            console.log("Artwork uploaded successfully");
+          } catch (error) {
+            console.error("Error uploading file:", error.message);
+          }
+        }
+      } catch (error) {
+        console.error("Error moderating image:", error);
+      }
     }
-    setUploadImagePreview(url);
-    setShowUploadInformation(true);
-    setShowPublishBtn(true);
   };
 
-  const handleDeleteUploadImage = () => {
-    setUploadImagePreview(null);
-    setShowUploadInformation(false);
-    setShowPublishBtn(false);
+  const handleDeleteUploadImage = async () => {
+    setLoadingUploadImage(true);
+    //Delete image from firebase
+    try {
+      // Extracting the image path from the URL
+      const parsedUrl = new URL(artWorkData.url);
+      const pathWithoutLeadingSlash = parsedUrl.pathname.substring(1);
+      const imagePath = pathWithoutLeadingSlash.split("o/")[1];
+      const decodedImagePath = decodeURIComponent(imagePath);
+      // Creating a reference to the image in Firebase Storage
+      const imageToDeleteRef = ref(storage, decodedImagePath);
+      // Deleting the image
+      await deleteObject(imageToDeleteRef);
+
+      // Update state or perform any additional actions after deletion
+      setArtWorkData({ ...artWorkData, url: "" });
+      setUploadImagePreview(null);
+      setShowUploadInformation(false);
+      setShowPublishBtn(false);
+      setLoadingUploadImage(false);
+      console.log("Artwork deleted successfully");
+    } catch (error) {
+      console.error("Error deleting file:", error.message);
+    }
   };
 
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
+  const handleChangeTitle = (e) => {
+    setArtWorkData({ ...artWorkData, title: e.target.value });
   };
 
-  const handlePublishPin = () => {};
+  const handleChangeDescription = (e) => {
+    setArtWorkData({ ...artWorkData, description: e.target.value });
+  };
+
+  const handleChangeLink = (e) => {
+    setArtWorkData({ ...artWorkData, link: e.target.value });
+  };
+
+  const handleChangeTag = (e) => {
+    const searchValue = e.target.value;
+    if (!searchValue.startsWith(" ")) {
+      setSearchTagValue(searchValue);
+      setSearchValue(searchValue);
+    }
+    if (searchValue === "") {
+      setShowSearchTag(false);
+    }
+  };
+
+  const handlePublishPin = () => {
+    const postArtworkData = {
+      userId: userData._id,
+      url: artWorkData.url,
+      title: artWorkData.title,
+      description: artWorkData.description,
+      link: artWorkData.link,
+      tag: searchValue,
+      isCheckedAds: artWorkData.isCheckedAds,
+      isCheckedComment: artWorkData.isCheckedComment,
+      isCheckedSimilar: artWorkData.isCheckedSimilar,
+    };
+
+    setLoadingPublish(true);
+
+    api
+      .post("/art/postArtwork", postArtworkData)
+      .then((response) => {
+        setArtWorkData({
+          url: "",
+          title: "",
+          description: "",
+          link: "",
+          isCheckedAds: true,
+          isCheckedComment: true,
+          isCheckedSimilar: true,
+        });
+        setSearchValue("");
+        setShowUploadInformation(false);
+        setShowPublishBtn(false);
+        setUploadImagePreview(null);
+        setLoadingPublish(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const handleShowMoreOptions = () => {
     setShowMoreOptions(!showMoreOptions);
@@ -92,12 +274,23 @@ function Create({ onLogout }) {
             </div>
             <div className={cx("content-right")}>
               {showPublishBtn && (
-                <button
-                  className={cx("publish-btn")}
-                  onClick={handlePublishPin}
-                >
-                  Publish
-                </button>
+                <div className={cx("publish-action")}>
+                  <button
+                    className={cx("publish-btn")}
+                    onClick={handlePublishPin}
+                  >
+                    Publish
+                  </button>
+                  {loadingPublish && (
+                    <div className={cx("publish-loading")}>
+                      <ClipLoader
+                        size={30}
+                        color="#fff"
+                        className={cx("loading-spinner")}
+                      />
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -111,6 +304,15 @@ function Create({ onLogout }) {
                       alt="upload-img-preview"
                       className={cx("image-upload")}
                     />
+                    {loadingUploadImage && (
+                      <div className={cx("image-loading")}>
+                        <ClipLoader
+                          size={40}
+                          color="#e60023"
+                          className={cx("loading-spinner")}
+                        />
+                      </div>
+                    )}
                     <div
                       className={cx("delete-upload-image")}
                       onClick={handleDeleteUploadImage}
@@ -177,9 +379,11 @@ function Create({ onLogout }) {
                     <input
                       type="text"
                       placeholder="Add a title"
+                      value={artWorkData.title}
                       spellCheck={false}
                       autoFocus={false}
                       className={cx("input")}
+                      onChange={handleChangeTitle}
                     />
                   </div>
                 </div>
@@ -190,8 +394,8 @@ function Create({ onLogout }) {
                     <textarea
                       className={cx("input")}
                       placeholder="Add a detailed description"
-                      onChange={handleDescriptionChange}
-                      value={description}
+                      onChange={handleChangeDescription}
+                      value={artWorkData.description}
                       rows={textareaRows}
                       ref={textareaRef}
                       autoFocus={true}
@@ -205,9 +409,11 @@ function Create({ onLogout }) {
                     <input
                       type="text"
                       placeholder="Add a link"
+                      value={artWorkData.link}
                       spellCheck={false}
                       autoFocus={false}
                       className={cx("input")}
+                      onChange={handleChangeLink}
                     />
                   </div>
                 </div>
@@ -217,16 +423,25 @@ function Create({ onLogout }) {
                   <div className={cx("tag-input")}>
                     <input
                       type="text"
-                      placeholder="Add a tag"
+                      placeholder="Search for a tag"
+                      value={searchValue}
                       spellCheck={false}
                       autoFocus={false}
                       className={cx("input")}
+                      onChange={handleChangeTag}
                     />
                   </div>
-                  <div className={cx("sub")}>
-                    Don't worry, people won't see your tags
-                  </div>
+
+                  {/* Search Tag */}
+                  {showSearchTag && (
+                    <SearchTag
+                      setShowSearchTag={setShowSearchTag}
+                      searchTagResult={searchTagResult}
+                      setSearchValue={setSearchValue}
+                    />
+                  )}
                 </div>
+
                 {/* More options */}
                 <div
                   className={
@@ -242,12 +457,8 @@ function Create({ onLogout }) {
                 {/* Show more options */}
                 {showMoreOptions && (
                   <MoreOptions
-                    isCheckedAds={isCheckedAds}
-                    isCheckedComment={isCheckedComment}
-                    isCheckedSimilar={isCheckedSimilar}
-                    setIsCheckedAds={setIsCheckedAds}
-                    setIsCheckedComment={setIsCheckedComment}
-                    setIsCheckedSimilar={setIsCheckedSimilar}
+                    artWorkData={artWorkData}
+                    setArtWorkData={setArtWorkData}
                   />
                 )}
               </div>

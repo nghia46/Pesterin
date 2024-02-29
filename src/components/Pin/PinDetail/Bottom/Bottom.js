@@ -1,17 +1,16 @@
 import classNames from "classnames/bind";
 import { useEffect, useRef, useState } from "react";
-import ReactionUI from "./ReactionUI";
 import Reaction from "./Reaction";
+import ReactionUI from "./ReactionUI";
 
-import Logo from "~/assets/images/logo.png";
-import Love from "~/assets/images/love.png";
 import Haha from "~/assets/images/haha.png";
+import Love from "~/assets/images/love.png";
 import Wow from "~/assets/images/wow.png";
 
 import styles from "./Bottom.module.scss";
 const cx = classNames.bind(styles);
 const validReactions = ["Love", "Haha", "Thank", "GoodIdea", "Wow"];
-function Bottom() {
+function Bottom({ userData }) {
   const textareaRef = useRef(null);
 
   const [inputComment, setInputComment] = useState("");
@@ -97,7 +96,11 @@ function Bottom() {
       </div>
       <div className={cx("input-comment")}>
         <div className={cx("user-avatar")}>
-          <img src={Logo} alt="user-avt" className={cx("avatar")} />
+          <img
+            src={userData.avatar && userData.avatar}
+            alt="user-avt"
+            className={cx("avatar")}
+          />
         </div>
         <div className={cx("input-container")}>
           <textarea

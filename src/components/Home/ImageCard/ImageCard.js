@@ -2,18 +2,18 @@ import classNames from "classnames/bind";
 import { useNavigate } from "react-router-dom";
 import styles from "./ImageCard.module.scss";
 const cx = classNames.bind(styles);
-function ImageCard({ image }) {
+function ImageCard({ artWork }) {
   const navigate = useNavigate();
 
   const handleClickImageCard = () => {
-    navigate("/pin");
+    navigate(`/pin/${artWork._id}`);
   };
 
   return (
     <div className={cx("image-card")}>
       <img
         loading="lazy"
-        src={image}
+        src={artWork.url}
         alt={`Artwork img`}
         className={cx("image-item")}
       />

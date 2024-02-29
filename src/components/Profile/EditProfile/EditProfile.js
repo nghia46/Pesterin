@@ -245,7 +245,7 @@ function EditProfile({ setShowEditProfile, setLoading }) {
                 onChange={handleChangeUsername}
               />
               <div className={cx("example")}>
-                www.pesterin.com/{userInfo.userName}
+                www.pesterin.com/{userInfo.userName.replace(/ /g, "")}
               </div>
             </div>
           </div>

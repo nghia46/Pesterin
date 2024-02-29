@@ -3,51 +3,44 @@ import classNames from "classnames/bind";
 
 import styles from "./MoreOptions.module.scss";
 const cx = classNames.bind(styles);
-function MoreOptions({
-  isCheckedAds,
-  isCheckedComment,
-  isCheckedSimilar,
-  setIsCheckedAds,
-  setIsCheckedComment,
-  setIsCheckedSimilar,
-}) {
+function MoreOptions({ artWorkData, setArtWorkData }) {
   const handleChangeAds = (checked) => {
-    setIsCheckedAds(checked);
+    setArtWorkData({ ...artWorkData, isCheckedAds: checked });
   };
   const handleChangeComment = (checked) => {
-    setIsCheckedComment(checked);
+    setArtWorkData({ ...artWorkData, isCheckedComment: checked });
   };
   const handleChangeSimilar = (checked) => {
-    setIsCheckedSimilar(checked);
+    setArtWorkData({ ...artWorkData, isCheckedSimilar: checked });
   };
   return (
     <div className={cx("more-options-content")}>
       <div className={cx("option-ads")}>
         <Switch
-          checked={isCheckedAds}
+          checked={artWorkData.isCheckedAds}
           onChange={handleChangeAds}
           style={{
-            background: isCheckedAds ? "#e60023" : "#efefef",
+            background: artWorkData.isCheckedAds ? "#e60023" : "#efefef",
           }}
         />
         <div className={cx("text")}>Allow ads</div>
       </div>
       <div className={cx("option-comment")}>
         <Switch
-          checked={isCheckedComment}
+          checked={artWorkData.isCheckedComment}
           onChange={handleChangeComment}
           style={{
-            background: isCheckedComment ? "#e60023" : "#efefef",
+            background: artWorkData.isCheckedComment ? "#e60023" : "#efefef",
           }}
         />
         <div className={cx("text")}>Allow people to comment</div>
       </div>
       <div className={cx("option-show-similar")}>
         <Switch
-          checked={isCheckedSimilar}
+          checked={artWorkData.isCheckedSimilar}
           onChange={handleChangeSimilar}
           style={{
-            background: isCheckedSimilar ? "#e60023" : "#efefef",
+            background: artWorkData.isCheckedSimilar ? "#e60023" : "#efefef",
           }}
         />
         <div className={cx("content")}>
