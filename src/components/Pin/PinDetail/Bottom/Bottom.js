@@ -1,5 +1,8 @@
 import classNames from "classnames/bind";
 import { useEffect, useRef, useState } from "react";
+
+import api from "~/services/apiService";
+
 import Reaction from "./Reaction";
 import ReactionUI from "./ReactionUI";
 
@@ -8,13 +11,20 @@ import Love from "~/assets/images/love.png";
 import Wow from "~/assets/images/wow.png";
 
 import styles from "./Bottom.module.scss";
+import { fetchGetCommentByArtId } from "~/services/commentService";
 const cx = classNames.bind(styles);
 const validReactions = ["Love", "Haha", "Thank", "GoodIdea", "Wow"];
-function Bottom({ userData }) {
+function Bottom({
+  userData,
+  pinInformation,
+  setListComments,
+  setLoadingShowListComment,
+}) {
   const textareaRef = useRef(null);
 
   const [inputComment, setInputComment] = useState("");
   const [textareaRows, setTextareaRows] = useState(1);
+
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [showReactions, setShowReactions] = useState(false);
   const [mouseIsOver, setMouseIsOver] = useState(false);
@@ -54,7 +64,7 @@ function Bottom({ userData }) {
     setTextareaRows(calculatedRows);
   }, [inputComment]);
 
-  const handleContentChange = (e) => {
+  const handleCommentChange = (e) => {
     setInputComment(e.target.value);
   };
 
@@ -65,6 +75,46 @@ function Bottom({ userData }) {
       setSelectedReaction("Love");
     }
   };
+
+  const handleSendComment = () => {
+    const commentData = {
+      artId: pinInformation._id,
+      author: {
+        userId: userData._id,
+        userName: userData.userName,
+        avatar: userData.avatar,
+      },
+      commentContent: inputComment,
+    };
+    api
+      .post(`/comment/post`, commentData)
+      .then((response) => {
+        setInputComment("");
+        callApiGetAllComments();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleKeyDownComment = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendComment();
+    }
+  };
+
+  const callApiGetAllComments = async () => {
+    setLoadingShowListComment(true);
+    try {
+      const commentList = await fetchGetCommentByArtId(pinInformation._id);
+      setListComments(commentList);
+      setLoadingShowListComment(false);
+    } catch (error) {
+      console.error("Error fetching creator information:", error);
+    }
+  };
+
   return (
     <div className={cx("interact")}>
       <div className={cx("comment-reaction")}>
@@ -106,7 +156,8 @@ function Bottom({ userData }) {
           <textarea
             className={cx("input")}
             placeholder="Add a comment"
-            onChange={handleContentChange}
+            onChange={handleCommentChange}
+            onKeyDown={handleKeyDownComment}
             value={inputComment}
             rows={textareaRows}
             ref={textareaRef}
@@ -115,7 +166,10 @@ function Bottom({ userData }) {
           ></textarea>
           {inputComment !== "" && (
             <div className={cx("send-comment-container")}>
-              <div className={cx("send-comment-btn")}>
+              <div
+                className={cx("send-comment-btn")}
+                onClick={handleSendComment}
+              >
                 <i className={cx("fa-solid fa-paper-plane-top", "icon")}></i>
               </div>
             </div>

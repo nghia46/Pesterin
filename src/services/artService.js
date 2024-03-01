@@ -1,0 +1,23 @@
+import api from "~/services/apiService";
+
+async function fetchArtworkList() {
+  try {
+    const response = await api.get("/art/getArtwork");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching artwork list:", error);
+    throw error;
+  }
+}
+
+async function fetchPinInformationById(id) {
+  try {
+    const response = await api.get(`/art/getArtworkById/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pin information:", error);
+    throw error;
+  }
+}
+
+export { fetchArtworkList, fetchPinInformationById };

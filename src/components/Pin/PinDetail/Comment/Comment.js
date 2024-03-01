@@ -1,29 +1,101 @@
 import classNames from "classnames/bind";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Logo from "~/assets/images/logo.png";
-import styles from "./Comment.module.scss";
+import { formatDistanceStrict } from "date-fns";
+
+import { fetchGetReplyCommentByCommentId } from "~/services/replyCommentService";
+
 import ReplyComment from "./ReplyComment";
 import ReplyCommentInput from "./ReplyCommentInput";
+
+import styles from "./Comment.module.scss";
 const cx = classNames.bind(styles);
-function Comment() {
+function Comment({ userData, comment }) {
   const [showReplyComment, setShowReplyComment] = useState(false);
+  const [listReplyComments, setListReplyComments] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const replyCommentList = await fetchGetReplyCommentByCommentId(
+          comment._id
+        );
+        setListReplyComments(replyCommentList);
+      } catch (error) {
+        console.error("Error fetching creator information:", error);
+      }
+    };
+
+    fetchData();
+  }, [comment._id]);
+
+  const getFormattedTimestamp = (createdAt) => {
+    const distance = formatDistanceStrict(new Date(createdAt), new Date(), {
+      addSuffix: true,
+    });
+
+    const match = distance.match(/(\d+) (\w+)/);
+
+    if (!match) {
+      return distance;
+    }
+
+    const [, value, unit] = match;
+    let formattedValue;
+
+    switch (unit) {
+      case "less":
+        formattedValue = "1s";
+        break;
+      case "seconds":
+        formattedValue = value === "1" ? "1s" : `${value}s`;
+        break;
+      case "minute":
+      case "minutes":
+        formattedValue = value === "1" ? "1m" : `${value}m`;
+        break;
+      case "hour":
+      case "hours":
+        formattedValue = value === "1" ? "1h" : `${value}h`;
+        break;
+      case "day":
+      case "days":
+        formattedValue = value === "1" ? "1d" : `${value}d`;
+        break;
+      case "month":
+      case "months":
+        formattedValue = value === "1" ? "1mo" : `${value}mo`;
+        break;
+      case "year":
+      case "years":
+        formattedValue = value === "1" ? "1y" : `${value}y`;
+        break;
+      default:
+        formattedValue = distance;
+    }
+
+    return formattedValue;
+  };
+
   return (
     <div className={cx("comment-container-main")}>
       <div className={cx("comment-content")}>
         <div className={cx("user-avatar")}>
-          <img src={Logo} alt="user-avatar" className={cx("avatar")} />
+          <img
+            src={comment?.author.avatar}
+            alt="user-avatar"
+            className={cx("avatar")}
+          />
         </div>
         <div className={cx("content-main")}>
           <Link to="" className={cx("username")}>
-            soph
+            {comment.author.userName}
           </Link>
-          <div className={cx("comment")}>
-            may i ask what laptop is that you have? may i ask what laptop is
-            that you have? may i ask what laptop is that you have?
-          </div>
+          <div className={cx("comment")}>{comment.commentContent}</div>
           <div className={cx("comment-options")}>
-            <div className={cx("create-at")}>11w</div>
+            <div className={cx("create-at")}>
+              {getFormattedTimestamp(comment.createdAt)}
+            </div>
             <div
               className={cx("reply")}
               onClick={() => setShowReplyComment(!showReplyComment)}
@@ -47,11 +119,17 @@ function Comment() {
       <div className={cx("reply-content")}>
         {showReplyComment && (
           <ReplyCommentInput
+            userData={userData}
+            comment={comment}
             showReplyComment={showReplyComment}
             setShowReplyComment={setShowReplyComment}
+            setListReplyComments={setListReplyComments}
           />
         )}
-        <ReplyComment />
+        {listReplyComments.length > 0 &&
+          listReplyComments.map((replyComment) => (
+            <ReplyComment key={replyComment._id} replyComment={replyComment} />
+          ))}
       </div>
     </div>
   );

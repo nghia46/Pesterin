@@ -1,6 +1,5 @@
 import { createContext, useEffect, useReducer } from "react";
-import api from "~/services/apiService";
-import { decryptUserId } from "~/utils/hashUserId";
+import { fetchUserData } from "~/services/userService";
 
 const AuthContext = createContext();
 
@@ -52,16 +51,9 @@ const AuthProvider = ({ children }) => {
     const fetchData = async () => {
       try {
         if (state.userId) {
-          const decodeUserId = decryptUserId(
-            state.userId,
-            process.env.REACT_APP_SECRET_KEY_ENCODE
-          );
-
-          await api
-            .get(`/user/getUserById/${decodeUserId}`)
-            .then((response) => {
-              setUserData(response.data);
-            });
+          const secretKey = process.env.REACT_APP_SECRET_KEY_ENCODE;
+          const userData = await fetchUserData(state.userId, secretKey);
+          setUserData(userData);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);

@@ -1,13 +1,23 @@
 import classNames from "classnames/bind";
 import { useEffect, useRef, useState } from "react";
+
+import api from "~/services/apiService";
+import { fetchGetReplyCommentByCommentId } from "~/services/replyCommentService";
+
 import styles from "./ReplyCommentInput.module.scss";
 const cx = classNames.bind(styles);
-function ReplyCommentInput({ showReplyComment, setShowReplyComment }) {
+function ReplyCommentInput({
+  userData,
+  comment,
+  showReplyComment,
+  setShowReplyComment,
+  setListReplyComments,
+}) {
   const textareaRef = useRef(null);
   const [replyContent, setReplyContent] = useState("");
   const [textareaRows, setTextareaRows] = useState(1);
 
-  const handleContentChange = (e) => {
+  const handleReplyCommentChange = (e) => {
     setReplyContent(e.target.value);
   };
 
@@ -27,13 +37,53 @@ function ReplyCommentInput({ showReplyComment, setShowReplyComment }) {
       setTextareaRows(calculatedRows);
     }
   }, [replyContent, showReplyComment]);
+
+  const handleSendReplyComment = () => {
+    const replyCommentData = {
+      commentId: comment._id,
+      author: {
+        userId: userData._id,
+        userName: userData.userName,
+        avatar: userData.avatar,
+      },
+      replyContent: replyContent,
+    };
+
+    api
+      .post(`/replyComment/post`, replyCommentData)
+      .then((response) => {
+        setReplyContent("");
+        setShowReplyComment(false);
+        callApiGetAllReplyComments();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleKeyDownReplyComment = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendReplyComment();
+    }
+  };
+
+  const callApiGetAllReplyComments = async () => {
+    try {
+      const commentList = await fetchGetReplyCommentByCommentId(comment._id);
+      setListReplyComments(commentList);
+    } catch (error) {
+      console.error("Error fetching creator information:", error);
+    }
+  };
   return (
     <div className={cx("reply-input")}>
       <div className={cx("comment-input")}>
         <textarea
           className={cx("input")}
           placeholder="Reply"
-          onChange={handleContentChange}
+          onChange={handleReplyCommentChange}
+          onKeyDown={handleKeyDownReplyComment}
           value={replyContent}
           rows={textareaRows}
           ref={textareaRef}
@@ -54,6 +104,7 @@ function ReplyCommentInput({ showReplyComment, setShowReplyComment }) {
               : cx("save-btn", "save-btn-active")
           }
           disabled={replyContent === ""}
+          onClick={handleSendReplyComment}
         >
           Save
         </button>
