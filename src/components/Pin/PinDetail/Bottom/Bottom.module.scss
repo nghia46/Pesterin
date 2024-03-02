@@ -39,31 +39,12 @@
           align-items: center;
           justify-content: center;
 
-          .icon-love {
-            cursor: pointer;
-            width: 19px;
-            height: 19px;
-            border-radius: 50%;
-            border: 1.5px solid #fff;
-            z-index: 2;
-          }
-
-          .icon-haha {
-            cursor: pointer;
-            margin-left: -5px;
-            width: 19px;
-            height: 19px;
-            border-radius: 50%;
-            border: 1.5px solid #fff;
-            z-index: 1;
-          }
-
+          .icon-love,
+          .icon-haha,
           .icon-wow {
             cursor: pointer;
-            margin-left: -5px;
-            width: 19px;
-            height: 19px;
-            border-radius: 50%;
+            width: 20px;
+            height: 20px;
             border: 1.5px solid #fff;
           }
         }
@@ -97,15 +78,16 @@
     display: flex;
     justify-content: center;
     .user-avatar {
-      width: 48px;
+      width: 56px;
       height: 56px;
       display: flex;
-      align-items: flex-end;
+      align-items: flex-start;
       margin-right: 8px;
 
       .avatar {
         width: 100%;
-        height: 48px;
+        height: 56px;
+        object-fit: cover;
         border-radius: 50%;
       }
     }

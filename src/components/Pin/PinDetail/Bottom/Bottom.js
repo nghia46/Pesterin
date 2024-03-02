@@ -12,6 +12,10 @@ import Wow from "~/assets/images/wow.png";
 
 import styles from "./Bottom.module.scss";
 import { fetchGetCommentByArtId } from "~/services/commentService";
+import {
+  fetchGetReactionByUserIdAndArtId,
+  fetchGetReactionLength,
+} from "~/services/artService";
 const cx = classNames.bind(styles);
 const validReactions = ["Love", "Haha", "Thank", "GoodIdea", "Wow"];
 function Bottom({
@@ -19,6 +23,7 @@ function Bottom({
   pinInformation,
   setListComments,
   setLoadingShowListComment,
+  countComment,
 }) {
   const textareaRef = useRef(null);
 
@@ -26,6 +31,7 @@ function Bottom({
   const [textareaRows, setTextareaRows] = useState(1);
 
   const [selectedReaction, setSelectedReaction] = useState(null);
+  const [countReaction, setCountReaction] = useState(0);
   const [showReactions, setShowReactions] = useState(false);
   const [mouseIsOver, setMouseIsOver] = useState(false);
 
@@ -46,9 +52,6 @@ function Bottom({
     };
   }, [mouseIsOver, setShowReactions]);
 
-  const handleReactionClick = (reactionContent) => {
-    setSelectedReaction(reactionContent);
-  };
   useEffect(() => {
     // Automatically resize the textarea when the content is changed
     if (textareaRef.current) {
@@ -64,15 +67,78 @@ function Bottom({
     setTextareaRows(calculatedRows);
   }, [inputComment]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const reactionResponse = await fetchGetReactionByUserIdAndArtId(
+          pinInformation._id,
+          userData._id
+        );
+        if (reactionResponse) {
+          setSelectedReaction(reactionResponse.reaction);
+        }
+      } catch (error) {
+        console.error("Error fetching reaction information:", error);
+      }
+    };
+
+    fetchData();
+  }, [pinInformation._id, userData._id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const reactionResponse = await fetchGetReactionLength(
+          pinInformation._id
+        );
+        if (reactionResponse) {
+          setCountReaction(reactionResponse.reactionLength);
+        }
+      } catch (error) {
+        console.error("Error fetching reaction information:", error);
+      }
+    };
+
+    fetchData();
+  }, [pinInformation._id]);
+
   const handleCommentChange = (e) => {
     setInputComment(e.target.value);
+  };
+
+  const handleReactionClick = (reactionContent) => {
+    if (selectedReaction !== reactionContent) {
+      const previousReaction = selectedReaction;
+      setSelectedReaction(reactionContent);
+      const reactionData = {
+        userId: userData._id,
+        reaction: reactionContent,
+      };
+      updateReactionCount(previousReaction, reactionContent);
+      callApiAddReaction(pinInformation._id, reactionData, previousReaction);
+    }
   };
 
   const handleDefaultClickReaction = () => {
     if (validReactions.includes(selectedReaction)) {
       setSelectedReaction(null);
+      const reactionData = {
+        userId: userData._id,
+        reaction: null,
+      };
+      setCountReaction((prev) => prev - 1);
+      callApiAddReaction(pinInformation._id, reactionData);
     } else {
       setSelectedReaction("Love");
+      const reactionData = {
+        userId: userData._id,
+        reaction: "Love",
+      };
+
+      const previousReaction = selectedReaction;
+      updateReactionCount(previousReaction, "Love");
+
+      callApiAddReaction(pinInformation._id, reactionData);
     }
   };
 
@@ -115,10 +181,35 @@ function Bottom({
     }
   };
 
+  const callApiAddReaction = (artId, reactionData) => {
+    api
+      .post(`/art/add-reaction/${artId}`, reactionData)
+      .then((response) => {})
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const updateReactionCount = (previousReaction, newReaction) => {
+    if (previousReaction) {
+      setCountReaction((prev) => prev - 1);
+    }
+    if (newReaction) {
+      setCountReaction((prev) => prev + 1);
+    }
+  };
+
   return (
     <div className={cx("interact")}>
       <div className={cx("comment-reaction")}>
-        <div className={cx("number-of-comments")}>138 Comments</div>
+        {countComment > 0 ? (
+          <div className={cx("number-of-comments")}>
+            {countComment} {countComment > 1 ? "Comments" : "Comment"}
+          </div>
+        ) : (
+          <div className={cx("number-of-comments")}>What do you think?</div>
+        )}
+
         <div className={cx("reaction-container")}>
           <div className={cx("number-of-reactions")}>
             <div className={cx("list-icon")}>
@@ -126,7 +217,7 @@ function Bottom({
               <img src={Haha} alt="icon" className={cx("icon-haha")} />
               <img src={Wow} alt="icon" className={cx("icon-wow")} />
             </div>
-            <div className={cx("number")}>1k</div>
+            <div className={cx("number")}>{countReaction}</div>
           </div>
           <div
             className={cx("interact-react")}

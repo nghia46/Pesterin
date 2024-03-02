@@ -1,7 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import { Link } from "react-router-dom";
+
 import { AuthContext } from "~/contexts/AuthContext";
+import { fetchGetFollowing } from "~/services/followService";
 
 import MainHeader from "~/layouts/MainHeader";
 import Saved from "~/components/Profile/Saved";
@@ -17,6 +19,21 @@ function Profile({ onLogout }) {
   const [showContent, setShowContent] = useState("Saved");
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [countFollowing, setCountFollowing] = useState(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch following length
+        const followings = await fetchGetFollowing(userData._id);
+        setCountFollowing(followings.length);
+      } catch (error) {
+        console.error("Error fetching creator information:", error);
+      }
+    };
+
+    fetchData();
+  }, [userData._id]);
   return (
     <>
       {loading && <LoadingSpinner loading={loading} />}
@@ -61,7 +78,7 @@ function Profile({ onLogout }) {
               )}
 
               <div className={cx("following")}>
-                <span className={cx("number")}>1000</span>
+                <span className={cx("number")}>{countFollowing}</span>
                 <span className={cx("text")}>following</span>
               </div>
               <div className={cx("profile-action")}>
@@ -117,7 +134,11 @@ function Profile({ onLogout }) {
             </div>
           </div>
           {/* Content */}
-          {showContent === "Saved" ? <Saved /> : <Created />}
+          {showContent === "Saved" ? (
+            <Saved userData={userData} />
+          ) : (
+            <Created userData={userData} />
+          )}
         </div>
       </div>
     </>

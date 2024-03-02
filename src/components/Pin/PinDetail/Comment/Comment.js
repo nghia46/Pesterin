@@ -13,6 +13,7 @@ const cx = classNames.bind(styles);
 function Comment({ userData, comment }) {
   const [showReplyComment, setShowReplyComment] = useState(false);
   const [listReplyComments, setListReplyComments] = useState([]);
+  const [showAllReplyComments, setShowAllReplyComments] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,6 +78,10 @@ function Comment({ userData, comment }) {
     return formattedValue;
   };
 
+  const handleViewAllReply = () => {
+    setShowAllReplyComments(true);
+  };
+
   return (
     <div className={cx("comment-container-main")}>
       <div className={cx("comment-content")}>
@@ -126,7 +131,44 @@ function Comment({ userData, comment }) {
             setListReplyComments={setListReplyComments}
           />
         )}
-        {listReplyComments.length > 0 &&
+
+        {showAllReplyComments === false && listReplyComments.length > 1 && (
+          <div className={cx("show-all-reply")} onClick={handleViewAllReply}>
+            <i className={cx("fa-regular fa-comment-dots", "icon")}></i>
+            <span className={cx("text")}>
+              View {listReplyComments.length}{" "}
+              {listReplyComments.length > 1 ? "replies" : "reply"}
+            </span>
+          </div>
+        )}
+
+        {showAllReplyComments && (
+          <div
+            className={cx("show-all-reply")}
+            onClick={() => setShowAllReplyComments(false)}
+          >
+            <i className={cx("fa-regular fa-comment-dots", "icon")}></i>
+            <span className={cx("text")}>
+              Hide {listReplyComments.length > 1 ? "replies" : "reply"}
+            </span>
+          </div>
+        )}
+
+        {showAllReplyComments === false &&
+          listReplyComments &&
+          listReplyComments.length > 0 &&
+          listReplyComments
+            .slice(0, 1)
+            .map((replyComment) => (
+              <ReplyComment
+                key={replyComment._id}
+                replyComment={replyComment}
+              />
+            ))}
+
+        {showAllReplyComments &&
+          listReplyComments &&
+          listReplyComments.length > 0 &&
           listReplyComments.map((replyComment) => (
             <ReplyComment key={replyComment._id} replyComment={replyComment} />
           ))}

@@ -4,11 +4,14 @@ import { Link } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 import { fetchCreatorInformation } from "~/services/creatorService";
+import { fetchGetFollower, fetchGetFollowing } from "~/services/followService";
 
 import Comment from "../Comment";
 
 import styles from "./Middle.module.scss";
 import { fetchGetCommentByArtId } from "~/services/commentService";
+import { fetchGetReplyCommentByCommentId } from "~/services/replyCommentService";
+import api from "~/services/apiService";
 
 const cx = classNames.bind(styles);
 function Middle({
@@ -18,7 +21,10 @@ function Middle({
   setListComments,
   loadingShowListComment,
   setLoadingShowListComment,
+  setCountComment,
 }) {
+  const [following, setFollowing] = useState([]);
+  const [countFollower, setCountFollower] = useState(0);
   const [showFullContent, setShowFullContent] = useState(false);
   const [showComment, setShowComment] = useState(true);
   const [creator, setCreator] = useState();
@@ -30,20 +36,57 @@ function Middle({
           pinInformation.userId
         );
         setCreator(creatorData);
+
+        // Fetch following data only if creatorData is available
+        const followingList = await fetchGetFollowing(userData._id);
+        const filteredUserData = followingList.filter(
+          (user) => user === creatorData._id
+        );
+        setFollowing(filteredUserData);
+
+        // Fetch follower data only if creatorData is available
+        const followerList = await fetchGetFollower(creatorData._id);
+        setCountFollower(followerList.length);
       } catch (error) {
-        console.error("Error fetching creator information:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [pinInformation.userId]);
+  }, [pinInformation.userId, setCountComment, userData._id]);
 
   useEffect(() => {
     setLoadingShowListComment(true);
     const fetchData = async () => {
       try {
-        const commentList = await fetchGetCommentByArtId(pinInformation._id);
-        setListComments(commentList);
+        const comments = await fetchGetCommentByArtId(pinInformation._id);
+        const countTopLevelComments = comments.length;
+
+        let countReplyComments = 0;
+
+        const fetchAndCountReplies = async (commentId) => {
+          try {
+            const replyResponse = await fetchGetReplyCommentByCommentId(
+              commentId
+            );
+            countReplyComments += replyResponse.length;
+          } catch (error) {
+            console.error(
+              `Error fetching replies for comment ${commentId}:`,
+              error
+            );
+          }
+        };
+        // Create an array of promises for each fetchAndCountReplies call
+        const fetchPromises = comments.map((comment) =>
+          fetchAndCountReplies(comment._id)
+        );
+
+        // Wait for all promises to resolve
+        await Promise.all(fetchPromises);
+        const totalCountComments = countTopLevelComments + countReplyComments;
+        setListComments(comments);
+        setCountComment(totalCountComments);
         setLoadingShowListComment(false);
       } catch (error) {
         console.error("Error fetching creator information:", error);
@@ -51,13 +94,58 @@ function Middle({
     };
 
     fetchData();
-  }, [pinInformation._id, setListComments, setLoadingShowListComment]);
+  }, [
+    pinInformation._id,
+    setCountComment,
+    setListComments,
+    setLoadingShowListComment,
+  ]);
 
   const handleShowComment = () => {
     setShowComment(!showComment);
   };
   const toggleContent = () => {
     setShowFullContent(!showFullContent);
+  };
+
+  const handleFollow = async () => {
+    try {
+      await api.post(`/follow/createFollow/${userData._id}/${creator._id}`);
+
+      // Fetch following data only if creatorData is available
+      const followingList = await fetchGetFollowing(userData._id);
+      const filteredUserData = followingList.filter(
+        (user) => user === creator._id
+      );
+      setFollowing(filteredUserData);
+
+      // Fetch follower data only if creatorData is available
+      const followerList = await fetchGetFollower(creator._id);
+      setCountFollower(followerList.length);
+
+      // Additional logic if needed after the follow operation
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUnFollow = async () => {
+    try {
+      await api.delete(`/follow/deleteFollow/${userData._id}/${creator._id}`);
+
+      // Fetch following data only if creatorData is available
+      const followingList = await fetchGetFollowing(userData._id);
+      const filteredUserData = followingList.filter(
+        (user) => user === creator._id
+      );
+      setFollowing(filteredUserData);
+
+      // Fetch follower data only if creatorData is available
+      const followerList = await fetchGetFollower(creator._id);
+      setCountFollower(followerList.length);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -142,12 +230,28 @@ function Middle({
                   >
                     {creator.userName}
                   </Link>
-                  <div className={cx("followers")}>1.3M followers</div>
+                  <div className={cx("followers")}>
+                    {countFollower}{" "}
+                    {countFollower > 1 ? "Followers" : "Follower"}
+                  </div>
                 </div>
               </div>
-              <div className={cx("creator-follow")}>
-                <button className={cx("follow-btn")}>Follow</button>
-              </div>
+              {following.length > 0 ? (
+                <div className={cx("creator-following")}>
+                  <button
+                    className={cx("following-btn")}
+                    onClick={handleUnFollow}
+                  >
+                    Following
+                  </button>
+                </div>
+              ) : (
+                <div className={cx("creator-follow")}>
+                  <button className={cx("follow-btn")} onClick={handleFollow}>
+                    Follow
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>

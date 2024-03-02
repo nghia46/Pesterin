@@ -20,4 +20,40 @@ async function fetchPinInformationById(id) {
   }
 }
 
-export { fetchArtworkList, fetchPinInformationById };
+async function fetchPinInformationByUserId(userId) {
+  try {
+    const response = await api.get(`/art/getArtworkByUserId/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pin information:", error);
+    throw error;
+  }
+}
+
+async function fetchGetReactionByUserIdAndArtId(artId, userId) {
+  try {
+    const response = await api.get(`art/get-reaction/${artId}/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pin information:", error);
+    throw error;
+  }
+}
+
+async function fetchGetReactionLength(artId) {
+  try {
+    const response = await api.get(`art/get-reaction-length/${artId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pin information:", error);
+    throw error;
+  }
+}
+
+export {
+  fetchArtworkList,
+  fetchPinInformationById,
+  fetchPinInformationByUserId,
+  fetchGetReactionByUserIdAndArtId,
+  fetchGetReactionLength,
+};

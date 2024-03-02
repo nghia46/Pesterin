@@ -16,6 +16,7 @@ function PinDetail({
   loadingShowPinInformation,
 }) {
   const [listComments, setListComments] = useState([]);
+  const [countComment, setCountComment] = useState(0);
   const [loadingShowListComment, setLoadingShowListComment] = useState(false);
 
   return (
@@ -42,7 +43,11 @@ function PinDetail({
           ) : (
             <div className={cx("pin-detail-information")}>
               {/* Top */}
-              <Top setShowReportPin={setShowReportPin} />
+              <Top
+                userData={userData}
+                pinInformation={pinInformation}
+                setShowReportPin={setShowReportPin}
+              />
               {/* Middle */}
               <Middle
                 userData={userData}
@@ -51,6 +56,7 @@ function PinDetail({
                 setListComments={setListComments}
                 loadingShowListComment={loadingShowListComment}
                 setLoadingShowListComment={setLoadingShowListComment}
+                setCountComment={setCountComment}
               />
               {/* Bottom */}
               <Bottom
@@ -58,6 +64,7 @@ function PinDetail({
                 pinInformation={pinInformation}
                 setListComments={setListComments}
                 setLoadingShowListComment={setLoadingShowListComment}
+                countComment={countComment}
               />
             </div>
           )}

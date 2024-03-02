@@ -1,17 +1,49 @@
 import React, { useState } from "react";
 import classNames from "classnames/bind";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import api from "~/services/apiService";
 import { reportDatas } from "~/datas/reportDatas";
+
 import styles from "./ReportPin.module.scss";
 const cx = classNames.bind(styles);
-function ReportPin({ setShowReportPin }) {
+function ReportPin({ userData, pinInformation, setShowReportPin }) {
   const [selectedReport, setSelectedReport] = useState(null);
+  const [report, setReport] = useState();
 
-  const handleRadioChange = (reportId) => {
+  const handleRadioChange = (reportId, report) => {
     setSelectedReport(reportId);
+    setReport(report);
   };
 
   const handleSave = () => {
-    console.log(`Saving report with ID: ${selectedReport}`);
+    const reportData = {
+      userID: userData._id,
+      artID: pinInformation._id,
+      reportTitle: report.title,
+      reportDescription: report.desc,
+      reportType: "Artwork",
+      reportStatus: true,
+    };
+
+    api
+      .post("/report/createReport", reportData)
+      .then((response) => {
+        setShowReportPin(false);
+        // Show Toastify notification
+        toast.success("Report Successfully", {
+          position: "top-right",
+          autoClose: 1500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleCancel = () => {
@@ -41,7 +73,7 @@ function ReportPin({ setShowReportPin }) {
                       name="reportGroup"
                       className={cx("input-report")}
                       checked={selectedReport === report.id}
-                      onChange={() => handleRadioChange(report.id)}
+                      onChange={() => handleRadioChange(report.id, report)}
                     />
                   </div>
                   <div className={cx("report-content")}>

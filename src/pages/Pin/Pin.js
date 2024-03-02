@@ -45,7 +45,13 @@ function Pin({ onLogout }) {
 
   return (
     <>
-      {showReportPin && <ReportPin setShowReportPin={setShowReportPin} />}
+      {showReportPin && (
+        <ReportPin
+          userData={userData}
+          pinInformation={pinInformation}
+          setShowReportPin={setShowReportPin}
+        />
+      )}
       <div className={cx("pin-wrapper")}>
         <MainHeader onLogout={onLogout} />
         <div className={cx("pin-container")}>
