@@ -54,15 +54,25 @@ function Creator({ onLogout }) {
     fetchData();
   }, [id, userData._id]);
 
-  const handleFollow = () => {
-    api
-      .post(`/follow/createFollow/${userData._id}/${creator._id}`)
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleFollow = async () => {
+    try {
+      await api.post(`/follow/createFollow/${userData._id}/${creator._id}`);
+
+      // Fetch following data only if creatorData is available
+      const followingList = await fetchGetFollowing(userData._id);
+      const filteredUserData = followingList.filter(
+        (user) => user === creator._id
+      );
+      setFollowing(filteredUserData);
+
+      // Fetch follower data only if creatorData is available
+      const followerList = await fetchGetFollower(creator._id);
+      setCountFollower(followerList.length);
+
+      // Additional logic if needed after the follow operation
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <>

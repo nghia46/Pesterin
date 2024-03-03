@@ -5,7 +5,7 @@ import Create from "~/pages/Create";
 import Pin from "~/pages/Pin";
 import Profile from "~/pages/Profile";
 import Creator from "~/pages/Creator";
-import SearchTag from "~/components/Create/SearchTag";
+import Notifications from "~/components/Notifications/Notifications";
 const publicRoutes = [
   { path: "/", component: Home },
   { path: "/", component: LandingPage },
@@ -14,7 +14,7 @@ const publicRoutes = [
   { path: "/pin/:id", component: Pin },
   { path: "/profile", component: Profile },
   { path: "/creator/:id", component: Creator },
-  { path: "/page", component: SearchTag },
+  { path: "/page", component: Notifications },
 ];
 
 export { publicRoutes };

@@ -13,6 +13,7 @@ const cx = classNames.bind(styles);
 function Home({ onLogout }) {
   const [artworksList, setArtworksList] = useState([]);
   const [loadingShowArtworksList, setLoadingShowArtworksList] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
       try {

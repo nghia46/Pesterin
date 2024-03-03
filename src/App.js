@@ -8,11 +8,12 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { publicRoutes } from "~/routes";
 import { AuthProvider } from "./contexts/AuthContext";
+import { publicRoutes } from "~/routes";
+
+import Explore from "./pages/Explore";
 import Home from "./pages/Home";
 import LandingPage from "./pages/LandingPage";
-import Explore from "./pages/Explore";
 
 function App() {
   const [isLoggedIn, setLoggedIn] = useState(() => {
@@ -41,7 +42,7 @@ function App() {
           <Routes>
             {publicRoutes.map((route, index) => {
               let Page = route.component;
-
+  
               if (route.path === "/") {
                 return (
                   <Route
@@ -71,7 +72,7 @@ function App() {
                   />
                 );
               }
-
+  
               return (
                 <Route
                   key={index}
