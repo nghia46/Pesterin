@@ -15,7 +15,7 @@ function ReplyComment({ replyComment }) {
       return distance;
     }
 
-    const [, value, unit] = match;
+    const [value, unit] = match;
     let formattedValue;
 
     switch (unit) {

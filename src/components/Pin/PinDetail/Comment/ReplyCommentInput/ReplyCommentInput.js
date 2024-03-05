@@ -5,13 +5,17 @@ import api from "~/services/apiService";
 import { fetchGetReplyCommentByCommentId } from "~/services/replyCommentService";
 
 import styles from "./ReplyCommentInput.module.scss";
+import { fetchGetCommentByArtId } from "~/services/commentService";
 const cx = classNames.bind(styles);
 function ReplyCommentInput({
   userData,
+  pinInformation,
   comment,
   showReplyComment,
   setShowReplyComment,
   setListReplyComments,
+  setCountComment,
+  setLoadingShowListComment,
 }) {
   const textareaRef = useRef(null);
   const [replyContent, setReplyContent] = useState("");
@@ -55,6 +59,7 @@ function ReplyCommentInput({
         setReplyContent("");
         setShowReplyComment(false);
         callApiGetAllReplyComments();
+        callApiGetAllComments();
       })
       .catch((error) => {
         console.log(error);
@@ -76,6 +81,42 @@ function ReplyCommentInput({
       console.error("Error fetching creator information:", error);
     }
   };
+
+  const callApiGetAllComments = async () => {
+    setLoadingShowListComment(true);
+    try {
+      const comments = await fetchGetCommentByArtId(pinInformation._id);
+      const countTopLevelComments = comments.length;
+
+      const replyCounts = await Promise.all(
+        comments.map((comment) =>
+          callApiGetReplyCommentByCommentId(comment._id)
+        )
+      );
+
+      const countReplyComments = replyCounts.reduce(
+        (total, count) => total + count,
+        0
+      );
+
+      const totalCountComments = countTopLevelComments + countReplyComments;
+      setCountComment(totalCountComments);
+      setLoadingShowListComment(false);
+    } catch (error) {
+      console.error("Error fetching creator information:", error);
+    }
+  };
+
+  const callApiGetReplyCommentByCommentId = async (commentId) => {
+    try {
+      const replyResponse = await fetchGetReplyCommentByCommentId(commentId);
+      return replyResponse.length;
+    } catch (error) {
+      console.error(`Error fetching replies for comment ${commentId}:`, error);
+      return 0;
+    }
+  };
+
   return (
     <div className={cx("reply-input")}>
       <div className={cx("comment-input")}>

@@ -5,8 +5,13 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "~/services/apiService";
-
 import { getUnreadNotifications } from "~/services/notificationService";
+
+import Haha from "~/assets/images/haha.png";
+import Love from "~/assets/images/love.png";
+import Wow from "~/assets/images/wow.png";
+import GoodIdea from "~/assets/images/goodIdea.png";
+import Thank from "~/assets/images/thank.png";
 import styles from "./Notifications.modules.scss";
 const cx = classNames.bind(styles);
 
@@ -85,10 +90,57 @@ function Notifications({
               >
                 <div className={cx("user-avatar")}>
                   <img
-                    src={notify?.posterAvatar}
+                    src={notify?.senderAvatar}
                     alt="user-avt"
                     className={cx("avatar")}
                   />
+                  {notify.type.includes("react") ? (
+                    <div className={cx("notification-type-img")}>
+                      {notify.type === "new_react_Love" && (
+                        <img src={Love} alt="type" className={cx("img-type")} />
+                      )}
+                      {notify.type === "new_react_Haha" && (
+                        <img src={Haha} alt="type" className={cx("img-type")} />
+                      )}
+                      {notify.type === "new_react_Thank" && (
+                        <img
+                          src={Thank}
+                          alt="type"
+                          className={cx("img-type")}
+                        />
+                      )}
+                      {notify.type === "new_react_GoodIdea" && (
+                        <img
+                          src={GoodIdea}
+                          alt="type"
+                          className={cx("img-type")}
+                        />
+                      )}
+                      {notify.type === "new_react_Wow" && (
+                        <img src={Wow} alt="type" className={cx("img-type")} />
+                      )}
+                    </div>
+                  ) : (
+                    <div className={cx("notification-type")}>
+                      {notify.type === "new_follow" && (
+                        <i
+                          className={cx(
+                            "fa-solid fa-user-plus",
+                            "icon-user-plus"
+                          )}
+                        ></i>
+                      )}
+                      {(notify.type === "new_comment" ||
+                        notify.type === "new_reply_comment") && (
+                        <i
+                          className={cx("fa-solid fa-comment-dots", "icon")}
+                        ></i>
+                      )}
+                      {notify.type === "new_art_posted" && (
+                        <i className={cx("fa-brands fa-pinterest", "icon")}></i>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className={cx("notification-info")}>
                   <div

@@ -10,7 +10,13 @@ import ReplyCommentInput from "./ReplyCommentInput";
 
 import styles from "./Comment.module.scss";
 const cx = classNames.bind(styles);
-function Comment({ userData, comment }) {
+function Comment({
+  userData,
+  pinInformation,
+  comment,
+  setCountComment,
+  setLoadingShowListComment,
+}) {
   const [showReplyComment, setShowReplyComment] = useState(false);
   const [listReplyComments, setListReplyComments] = useState([]);
   const [showAllReplyComments, setShowAllReplyComments] = useState(false);
@@ -125,10 +131,13 @@ function Comment({ userData, comment }) {
         {showReplyComment && (
           <ReplyCommentInput
             userData={userData}
+            pinInformation={pinInformation}
             comment={comment}
             showReplyComment={showReplyComment}
             setShowReplyComment={setShowReplyComment}
             setListReplyComments={setListReplyComments}
+            setCountComment={setCountComment}
+            setLoadingShowListComment={setLoadingShowListComment}
           />
         )}
 

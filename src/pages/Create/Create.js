@@ -10,6 +10,7 @@ import { storage } from "~/configs/firebase";
 import { v4 } from "uuid";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
+import { Select } from "antd";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,6 +31,7 @@ function Create({ onLogout }) {
   const textareaRef = useRef(null);
 
   const [artWorkData, setArtWorkData] = useState({
+    access: "public",
     url: "",
     title: "",
     description: "",
@@ -187,6 +189,10 @@ function Create({ onLogout }) {
     }
   };
 
+  const handleChangeAccess = (value) => {
+    setArtWorkData({ ...artWorkData, access: value });
+  };
+
   const handleChangeTitle = (e) => {
     setArtWorkData({ ...artWorkData, title: e.target.value });
   };
@@ -213,6 +219,7 @@ function Create({ onLogout }) {
   const handlePublishPin = () => {
     const postArtworkData = {
       userId: userData._id,
+      access: artWorkData.access,
       url: artWorkData.url,
       title: artWorkData.title,
       description: artWorkData.description,
@@ -372,6 +379,24 @@ function Create({ onLogout }) {
                       )
                 }
               >
+                {/* Access */}
+                <div className={cx("access-content")}>
+                  <div className={cx("title")}>Access</div>
+                  <div className={cx("access-input")}>
+                    <Select
+                      className={cx("custom-select")}
+                      defaultValue="public"
+                      size="large"
+                      placeholder="Add access"
+                      style={{ width: "100%", borderColor: "#e60023" }}
+                      onChange={handleChangeAccess}
+                      options={[
+                        { value: "public", label: "Public" },
+                        { value: "private", label: "Private" },
+                      ]}
+                    />
+                  </div>
+                </div>
                 {/* Title */}
                 <div className={cx("title-content")}>
                   <div className={cx("title")}>Title</div>
@@ -441,7 +466,6 @@ function Create({ onLogout }) {
                     />
                   )}
                 </div>
-
                 {/* More options */}
                 <div
                   className={

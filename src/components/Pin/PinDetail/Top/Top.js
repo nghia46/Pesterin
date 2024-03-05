@@ -100,7 +100,10 @@ function Top({ userData, pinInformation, setShowReportPin }) {
           </div>
         </div>
         {showMoreOptions && (
-          <MoreOptionsPin setShowReportPin={setShowReportPin} />
+          <MoreOptionsPin
+            pinInformation={pinInformation}
+            setShowReportPin={setShowReportPin}
+          />
         )}
         {showShare && <SharingPin />}
         <div className={cx("action-right")}>

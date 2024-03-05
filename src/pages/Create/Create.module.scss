@@ -279,7 +279,24 @@
             margin-top: 24px;
             padding: 0 4px;
 
+            .access-content {
+              margin-bottom: 30px;
+              .title {
+                width: 100%;
+                font-size: 12px;
+                padding-bottom: 8px;
+                color: var(--text-color-black);
+              }
+
+              // .access-input {
+              //   .custom-select {
+              //     width: 100%;
+              //   }
+              // }
+            }
+
             .title-content {
+              margin-bottom: 30px;
               .title {
                 width: 100%;
                 font-size: 12px;
@@ -306,7 +323,7 @@
             }
 
             .desc-content {
-              margin-top: 30px;
+              margin-bottom: 30px;
               .title {
                 width: 100%;
                 font-size: 12px;
@@ -339,7 +356,7 @@
             }
 
             .link-content {
-              margin-top: 30px;
+              margin-bottom: 30px;
               .title {
                 width: 100%;
                 font-size: 12px;
@@ -367,7 +384,6 @@
 
             .tag-content {
               position: relative;
-              margin-top: 30px;
               .title {
                 width: 100%;
                 font-size: 12px;

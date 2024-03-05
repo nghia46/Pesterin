@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import { useState } from "react";
-
+import { Watermark } from "antd";
 import Bottom from "./Bottom";
 import Middle from "./Middle";
 import Top from "./Top";
@@ -25,11 +25,21 @@ function PinDetail({
         <div className={cx("pin-detail")}>
           {/* Image */}
           <div className={cx("pin-image")}>
-            <img
-              src={pinInformation.url}
-              alt="pin-img"
-              className={cx("image")}
-            />
+            <Watermark
+              content="Pesterin"
+              font={{
+                color: "#e9e9e9",
+                fontSize: 20,
+              }}
+              zIndex={10}
+              gap={[60, 70]}
+            >
+              <img
+                src={pinInformation.url}
+                alt="pin-img"
+                className={cx("image")}
+              />
+            </Watermark>
           </div>
           {/* Content */}
           {loadingShowPinInformation ? (
@@ -65,6 +75,7 @@ function PinDetail({
                 setListComments={setListComments}
                 setLoadingShowListComment={setLoadingShowListComment}
                 countComment={countComment}
+                setCountComment={setCountComment}
               />
             </div>
           )}

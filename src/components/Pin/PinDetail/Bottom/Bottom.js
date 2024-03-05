@@ -12,10 +12,12 @@ import Wow from "~/assets/images/wow.png";
 
 import styles from "./Bottom.module.scss";
 import { fetchGetCommentByArtId } from "~/services/commentService";
+import { fetchGetReplyCommentByCommentId } from "~/services/replyCommentService";
 import {
   fetchGetReactionByUserIdAndArtId,
   fetchGetReactionLength,
 } from "~/services/artService";
+
 const cx = classNames.bind(styles);
 const validReactions = ["Love", "Haha", "Thank", "GoodIdea", "Wow"];
 function Bottom({
@@ -24,6 +26,7 @@ function Bottom({
   setListComments,
   setLoadingShowListComment,
   countComment,
+  setCountComment,
 }) {
   const textareaRef = useRef(null);
 
@@ -173,11 +176,37 @@ function Bottom({
   const callApiGetAllComments = async () => {
     setLoadingShowListComment(true);
     try {
-      const commentList = await fetchGetCommentByArtId(pinInformation._id);
-      setListComments(commentList);
+      const comments = await fetchGetCommentByArtId(pinInformation._id);
+      const countTopLevelComments = comments.length;
+
+      const replyCounts = await Promise.all(
+        comments.map((comment) =>
+          callApiGetReplyCommentByCommentId(comment._id)
+        )
+      );
+
+      const countReplyComments = replyCounts.reduce(
+        (total, count) => total + count,
+        0
+      );
+
+      const totalCountComments = countTopLevelComments + countReplyComments;
+
+      setListComments(comments);
+      setCountComment(totalCountComments);
       setLoadingShowListComment(false);
     } catch (error) {
       console.error("Error fetching creator information:", error);
+    }
+  };
+
+  const callApiGetReplyCommentByCommentId = async (commentId) => {
+    try {
+      const replyResponse = await fetchGetReplyCommentByCommentId(commentId);
+      return replyResponse.length;
+    } catch (error) {
+      console.error(`Error fetching replies for comment ${commentId}:`, error);
+      return 0;
     }
   };
 
@@ -212,12 +241,16 @@ function Bottom({
 
         <div className={cx("reaction-container")}>
           <div className={cx("number-of-reactions")}>
-            <div className={cx("list-icon")}>
-              <img src={Love} alt="icon" className={cx("icon-love")} />
-              <img src={Haha} alt="icon" className={cx("icon-haha")} />
-              <img src={Wow} alt="icon" className={cx("icon-wow")} />
+            {countReaction > 0 && (
+              <div className={cx("list-icon")}>
+                <img src={Love} alt="icon" className={cx("icon-love")} />
+                <img src={Haha} alt="icon" className={cx("icon-haha")} />
+                <img src={Wow} alt="icon" className={cx("icon-wow")} />
+              </div>
+            )}
+            <div className={cx("number")}>
+              {countReaction > 0 && countReaction}
             </div>
-            <div className={cx("number")}>{countReaction}</div>
           </div>
           <div
             className={cx("interact-react")}

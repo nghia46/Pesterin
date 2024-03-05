@@ -287,7 +287,10 @@ function Middle({
                   <Comment
                     key={comment._id}
                     userData={userData}
+                    pinInformation={pinInformation}
                     comment={comment}
+                    setCountComment={setCountComment}
+                    setLoadingShowListComment={setLoadingShowListComment}
                   />
                 ))}
               </div>
