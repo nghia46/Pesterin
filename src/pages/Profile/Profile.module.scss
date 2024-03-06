@@ -3,6 +3,14 @@
   margin-top: 80px;
   height: fit-content;
   scroll-behavior: smooth;
+
+  .profile-loading {
+    width: 100%;
+    height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .profile-container {
     width: 100%;
 

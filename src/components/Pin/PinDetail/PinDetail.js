@@ -19,6 +19,14 @@ function PinDetail({
   const [countComment, setCountComment] = useState(0);
   const [loadingShowListComment, setLoadingShowListComment] = useState(false);
 
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDragStart = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <>
       {pinInformation && (
@@ -38,6 +46,8 @@ function PinDetail({
                 src={pinInformation.url}
                 alt="pin-img"
                 className={cx("image")}
+                onContextMenu={handleContextMenu}
+                onDragStart={handleDragStart}
               />
             </Watermark>
           </div>

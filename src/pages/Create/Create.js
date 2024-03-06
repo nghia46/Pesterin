@@ -355,7 +355,6 @@ function Create({ onLogout }) {
                         type="file"
                         accept="image/*"
                         name="img"
-                        multiple
                         className={cx("image-input")}
                         style={{ display: "none" }}
                         onChange={handleChangeUploadImage}

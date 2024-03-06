@@ -42,7 +42,7 @@ function App() {
           <Routes>
             {publicRoutes.map((route, index) => {
               let Page = route.component;
-  
+
               if (route.path === "/") {
                 return (
                   <Route
@@ -72,7 +72,7 @@ function App() {
                   />
                 );
               }
-  
+
               return (
                 <Route
                   key={index}

@@ -50,10 +50,21 @@ async function fetchGetReactionLength(artId) {
   }
 }
 
+async function fetchGetArtworkByCategoryId(categoryId) {
+  try {
+    const response = await api.get(`art/getArtworkByCategoryId/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching pin information:", error);
+    throw error;
+  }
+}
+
 export {
   fetchArtworkList,
   fetchPinInformationById,
   fetchPinInformationByUserId,
   fetchGetReactionByUserIdAndArtId,
   fetchGetReactionLength,
+  fetchGetArtworkByCategoryId,
 };

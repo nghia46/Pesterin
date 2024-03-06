@@ -7,16 +7,13 @@ import {
   fetchGetNotificationsForUser,
   getUnreadNotifications,
 } from "~/services/notificationService";
-import useDebounce from "~/hooks/useDebounce";
 
 import Logo from "~/assets/images/logo.png";
 import UserDefaultImg from "~/assets/images/user-default.png";
 import AccountOptions from "~/components/AccountOptions";
 import Notifications from "~/components/Notifications";
-import Search from "~/components/MainHeader/Search";
 
-import styles from "./MainHeader.module.scss";
-import api from "~/services/apiService";
+import styles from "./HeaderNoSearch.module.scss";
 const cx = classNames.bind(styles);
 const headerNav = [
   {
@@ -36,17 +33,11 @@ function MainHeader({ onLogout }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [searchValue, setSearchValue] = useState("");
-  const [searchResult, setSearchResult] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [countNotifications, setCountNotifications] = useState();
 
-  const [showSearch, setShowSearch] = useState(false);
-  const [showSearchInput, setShowSearchInput] = useState(false);
   const [showAccountSetting, setShowAccountSetting] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-
-  const debouncedValue = useDebounce(searchValue, 300);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,26 +75,6 @@ function MainHeader({ onLogout }) {
     fetchData();
   }, [userData._id]);
 
-  useEffect(() => {
-    if (!debouncedValue.trim()) {
-      setSearchResult([]);
-      return;
-    }
-
-    const fetchAPI = async () => {
-      api
-        .get(`/art//searchArtwork/${debouncedValue}`)
-        .then((response) => {
-          setSearchResult(response.data);
-          // console.log(response.data);
-        })
-        .catch((error) => {
-          console.log(error.response.data.message);
-        });
-    };
-    fetchAPI();
-  }, [debouncedValue]);
-
   const handleNavItemClick = (path) => {
     navigate(path);
   };
@@ -113,18 +84,6 @@ function MainHeader({ onLogout }) {
       setCountNotifications(0);
     }
     setShowAccountSetting(!showAccountSetting);
-  };
-
-  const handleShowSearch = () => {
-    setShowSearchInput(true);
-    setShowSearch(true);
-  };
-
-  const handleChangeSearchInput = (e) => {
-    const searchValue = e.target.value;
-    if (!searchValue.startsWith(" ")) {
-      setSearchValue(searchValue);
-    }
   };
   return (
     <div className={cx("main-header-wrapper")}>
@@ -160,47 +119,6 @@ function MainHeader({ onLogout }) {
               );
             })}
           </div>
-        </div>
-        <div className={cx("header-middle")}>
-          {showSearchInput ? (
-            <div className={cx("header-search-focus")}>
-              <input
-                type="text"
-                value={searchValue}
-                spellCheck={false}
-                autoFocus={true}
-                placeholder="Search"
-                className={cx("search-input")}
-                onChange={handleChangeSearchInput}
-              />
-
-              <div className={cx("close-search")}>
-                <div
-                  className={cx("icon-close")}
-                  onClick={() => {
-                    setShowSearchInput(false);
-                    setShowSearch(false);
-                  }}
-                >
-                  <i className={cx("fa-solid fa-circle-xmark", "icon")}></i>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className={cx("header-search")} onClick={handleShowSearch}>
-              <i
-                className={cx("fa-solid fa-magnifying-glass", "search-icon")}
-              ></i>
-              <span className={cx("search-focus")}>Search</span>
-            </div>
-          )}
-          {showSearch && (
-            <Search
-              searchValue={searchValue}
-              searchResult={searchResult}
-              setShowSearch={setShowSearch}
-            />
-          )}
         </div>
         <div className={cx("header-right")}>
           <div
