@@ -1,17 +1,15 @@
-import React, { useContext } from "react";
 import classNames from "classnames/bind";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+
 import { AuthContext } from "~/contexts/AuthContext";
+import api from "~/services/apiService";
+import TokenService from "~/services/tokenService";
+
 import UserDefaultImg from "~/assets/images/user-default.png";
 import styles from "./AccountOptions.module.scss";
-import TokenService from "~/services/tokenService";
-import api from "~/services/apiService";
 const cx = classNames.bind(styles);
-const yourAccount = [
-  { id: 1, text: "Add account", path: "/add-account" },
-  { id: 2, text: "Add payment method", path: "/add-payment" },
-  { id: 3, text: "Convert to business", path: "/convert-business" },
-];
+const yourAccount = [{ id: 1, text: "Add account", path: "/add-account" }];
 
 const moreOptions = [
   {
@@ -63,12 +61,11 @@ const moreOptions = [
     icon: true,
   },
 ];
-function AccountOptions({ onLogout }) {
+function AccountOptions({ onLogout, packageName }) {
   const { userData, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
     const refreshToken = TokenService.getRefreshToken();
-
     api
       .post("/auth/logout", { refreshToken })
       .then((res) => {
@@ -97,7 +94,14 @@ function AccountOptions({ onLogout }) {
               </div>
               <div className={cx("user-info")}>
                 <div className={cx("username")}>
-                  {userData.firstName + " " + userData.lastName.split(" ")[0]}
+                  <span className={cx("text")}>
+                    {userData.firstName + " " + userData.lastName.split(" ")[0]}
+                  </span>
+                  {packageName && (
+                    <span className={cx("type-package")}>
+                      {"(" + packageName + ")"}
+                    </span>
+                  )}
                 </div>
                 <div className={cx("account-type")}>{userData.type}</div>
                 <div className={cx("email")}>{userData.email}</div>
@@ -119,6 +123,14 @@ function AccountOptions({ onLogout }) {
             <div className={cx("account-item-container")}>{item.text}</div>
           </Link>
         ))}
+        {!packageName && (
+          <Link to="/convert-business" className={cx("account-item-wrapper")}>
+            <div className={cx("account-item-container")}>
+              Convert to business
+            </div>
+          </Link>
+        )}
+
         {/* More options */}
         <div className={cx("more-options-text")}>More options</div>
         {moreOptions.map((option) => (

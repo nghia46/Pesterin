@@ -36,7 +36,7 @@ function Create({ onLogout }) {
     title: "",
     description: "",
     link: "",
-    isCheckedAds: true,
+    isCheckedAds: false,
     isCheckedComment: true,
     isCheckedSimilar: true,
   });
@@ -240,7 +240,7 @@ function Create({ onLogout }) {
           title: "",
           description: "",
           link: "",
-          isCheckedAds: true,
+          isCheckedAds: false,
           isCheckedComment: true,
           isCheckedSimilar: true,
         });

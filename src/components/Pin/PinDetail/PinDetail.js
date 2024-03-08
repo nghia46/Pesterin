@@ -12,7 +12,11 @@ const cx = classNames.bind(styles);
 function PinDetail({
   userData,
   setShowReportPin,
+  setShowNotifyNoPackage,
+  setShowNotifyUpgradePackage,
   pinInformation,
+  feature,
+  setFeature,
   loadingShowPinInformation,
 }) {
   const [listComments, setListComments] = useState([]);
@@ -33,15 +37,7 @@ function PinDetail({
         <div className={cx("pin-detail")}>
           {/* Image */}
           <div className={cx("pin-image")}>
-            <Watermark
-              content="Pesterin"
-              font={{
-                color: "#e9e9e9",
-                fontSize: 20,
-              }}
-              zIndex={10}
-              gap={[60, 70]}
-            >
+            {feature && feature.isWatermark === true ? (
               <img
                 src={pinInformation.url}
                 alt="pin-img"
@@ -49,7 +45,25 @@ function PinDetail({
                 onContextMenu={handleContextMenu}
                 onDragStart={handleDragStart}
               />
-            </Watermark>
+            ) : (
+              <Watermark
+                content="Pesterin"
+                font={{
+                  color: "#e9e9e9",
+                  fontSize: 20,
+                }}
+                zIndex={10}
+                gap={[60, 70]}
+              >
+                <img
+                  src={pinInformation.url}
+                  alt="pin-img"
+                  className={cx("image")}
+                  onContextMenu={handleContextMenu}
+                  onDragStart={handleDragStart}
+                />
+              </Watermark>
+            )}
           </div>
           {/* Content */}
           {loadingShowPinInformation ? (
@@ -66,7 +80,11 @@ function PinDetail({
               <Top
                 userData={userData}
                 pinInformation={pinInformation}
+                feature={feature && feature}
+                setFeature={setFeature}
                 setShowReportPin={setShowReportPin}
+                setShowNotifyNoPackage={setShowNotifyNoPackage}
+                setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
               />
               {/* Middle */}
               <Middle

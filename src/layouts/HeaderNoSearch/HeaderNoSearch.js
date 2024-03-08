@@ -2,6 +2,7 @@ import classNames from "classnames/bind";
 import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import api from "~/services/apiService";
 import { AuthContext } from "~/contexts/AuthContext";
 import {
   fetchGetNotificationsForUser,
@@ -35,9 +36,21 @@ function MainHeader({ onLogout }) {
 
   const [notifications, setNotifications] = useState([]);
   const [countNotifications, setCountNotifications] = useState();
+  const [packageName, setPackageName] = useState("");
 
   const [showAccountSetting, setShowAccountSetting] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  useEffect(() => {
+    if (userData.packageId) {
+      api
+        .get(`package/getPackageName/${userData.packageId}`)
+        .then((response) => {
+          console.log(response.data);
+          setPackageName(response.data);
+        });
+    }
+  }, [userData.packageId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,7 +100,9 @@ function MainHeader({ onLogout }) {
   };
   return (
     <div className={cx("main-header-wrapper")}>
-      {showAccountSetting && <AccountOptions onLogout={onLogout} />}
+      {showAccountSetting && (
+        <AccountOptions onLogout={onLogout} packageName={packageName} />
+      )}
       {showNotifications && (
         <Notifications
           userData={userData}

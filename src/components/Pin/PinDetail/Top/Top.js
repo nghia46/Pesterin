@@ -10,7 +10,15 @@ import SharingPin from "./SharingPin";
 import styles from "./Top.module.scss";
 const cx = classNames.bind(styles);
 
-function Top({ userData, pinInformation, setShowReportPin }) {
+function Top({
+  userData,
+  pinInformation,
+  feature,
+  setFeature,
+  setShowReportPin,
+  setShowNotifyNoPackage,
+  setShowNotifyUpgradePackage,
+}) {
   const [saved, setSaved] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -101,8 +109,13 @@ function Top({ userData, pinInformation, setShowReportPin }) {
         </div>
         {showMoreOptions && (
           <MoreOptionsPin
+            userData={userData}
             pinInformation={pinInformation}
+            feature={feature && feature}
+            setFeature={setFeature}
             setShowReportPin={setShowReportPin}
+            setShowNotifyNoPackage={setShowNotifyNoPackage}
+            setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
           />
         )}
         {showShare && <SharingPin />}

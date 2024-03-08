@@ -40,6 +40,7 @@ function MainHeader({ onLogout }) {
   const [searchResult, setSearchResult] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [countNotifications, setCountNotifications] = useState();
+  const [packageName, setPackageName] = useState("");
 
   const [showSearch, setShowSearch] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
@@ -85,6 +86,16 @@ function MainHeader({ onLogout }) {
   }, [userData._id]);
 
   useEffect(() => {
+    if (userData.packageId) {
+      api
+        .get(`package/getPackageName/${userData.packageId}`)
+        .then((response) => {
+          setPackageName(response.data);
+        });
+    }
+  }, [userData.packageId]);
+
+  useEffect(() => {
     if (!debouncedValue.trim()) {
       setSearchResult([]);
       return;
@@ -109,9 +120,6 @@ function MainHeader({ onLogout }) {
   };
 
   const handleOpenNotification = () => {
-    if (countNotifications > 0) {
-      setCountNotifications(0);
-    }
     setShowAccountSetting(!showAccountSetting);
   };
 
@@ -128,7 +136,9 @@ function MainHeader({ onLogout }) {
   };
   return (
     <div className={cx("main-header-wrapper")}>
-      {showAccountSetting && <AccountOptions onLogout={onLogout} />}
+      {showAccountSetting && (
+        <AccountOptions onLogout={onLogout} packageName={packageName} />
+      )}
       {showNotifications && (
         <Notifications
           userData={userData}

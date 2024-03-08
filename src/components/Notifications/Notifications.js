@@ -58,8 +58,10 @@ function Notifications({
       );
       setNotifications(notificationListResponse.data);
       setCountNotifications(notificationUnreadResponse.length);
-      navigate(`${notify.hyperLink}`);
       setShowNotifications(false);
+      if (notify.hyperLink) {
+        navigate(`${notify.hyperLink}`);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -138,6 +140,12 @@ function Notifications({
                       )}
                       {notify.type === "new_art_posted" && (
                         <i className={cx("fa-brands fa-pinterest", "icon")}></i>
+                      )}
+                      {(notify.type === "new_payment_package" ||
+                        notify.type === "new_free_package") && (
+                        <i
+                          className={cx("fa-sharp fa-solid fa-bell", "icon")}
+                        ></i>
                       )}
                     </div>
                   )}

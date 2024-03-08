@@ -1,34 +1,61 @@
 import classNames from "classnames/bind";
 import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "~/configs/firebase";
+import { fetchDecreaseDownloadCount } from "~/services/packageService";
 import styles from "./MoreOptionsPin.module.scss";
 const cx = classNames.bind(styles);
-function MoreOptionsPin({ pinInformation, setShowReportPin }) {
+function MoreOptionsPin({
+  userData,
+  pinInformation,
+  feature,
+  setFeature,
+  setShowReportPin,
+  setShowNotifyNoPackage,
+  setShowNotifyUpgradePackage,
+}) {
   const handleDownloadImage = () => {
-    const storageRef = ref(storage, pinInformation.url);
-    getDownloadURL(storageRef)
-      .then((url) => {
-        // Download the image as a blob
-        const xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = () => {
-          const blob = xhr.response;
+    if (!userData.packageId) {
+      setShowNotifyNoPackage(true);
+    } else if (feature.countDownload < 1) {
+      setShowNotifyUpgradePackage(true);
+    } else {
+      const storageRef = ref(storage, pinInformation.url);
+      getDownloadURL(storageRef)
+        .then((url) => {
+          const xhr = new XMLHttpRequest();
+          xhr.responseType = "blob";
+          xhr.onload = () => {
+            const blob = xhr.response;
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `downloaded_artwork_${pinInformation._id}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            //Call API
+            callApiDownloadImage();
+          };
 
-          // Create a temporary link to trigger the download
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = "downloaded_image.jpg";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        };
-        xhr.open("GET", url);
-        xhr.send();
-      })
-      .catch((error) => {
-        // Handle any errors
-        console.error("Error downloading image:", error);
-      });
+          xhr.open("GET", url);
+          xhr.send();
+        })
+        .catch((error) => {
+          console.error("Error downloading image:", error);
+        });
+    }
+  };
+
+  const callApiDownloadImage = async () => {
+    try {
+      const feature = await fetchDecreaseDownloadCount(
+        userData._id,
+        userData.packageId
+      );
+
+      setFeature(feature);
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <div className={cx("more-options-wrapper")}>

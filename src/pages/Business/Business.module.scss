@@ -40,7 +40,7 @@
         }
 
         .description {
-          width: 43%;
+          width: 50%;
           text-align: center;
           font-size: 16px;
           font-weight: 500;
@@ -144,7 +144,12 @@
                 border: none;
                 outline: none;
                 color: var(--text-color-white);
-                background-color: var(--primary);
+                background-color: var(--button-bg-primary);
+                transition: 0.2s ease-in-out;
+
+                &:hover {
+                  background-color: var(--button-bg-primary-hover);
+                }
               }
             }
           }
@@ -197,6 +202,20 @@
                   color: var(--text-color-white);
                 }
               }
+
+              .feature-not-access {
+                height: 22px;
+                margin-bottom: 16px;
+                .icon {
+                  margin-right: 8px;
+                  color: red;
+                }
+                .text {
+                  text-decoration: line-through;
+                  font-size: 15px;
+                  color: var(--text-color-black);
+                }
+              }
             }
 
             .action-container {
@@ -213,7 +232,12 @@
                 border: none;
                 outline: none;
                 color: var(--primary);
-                background-color: var(--bg-white);
+                background-color: var(--button-bg-secondary);
+                transition: 0.2s ease-in-out;
+
+                &:hover {
+                  background-color: var(--button-bg-secondary-hover);
+                }
               }
             }
           }
