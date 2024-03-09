@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Logo from "~/assets/images/logo.png";
 import styles from "./NoPackagePopup.module.scss";
 const cx = classNames.bind(styles);
-function NoPackagePopup({ setShowNotifyNoPackage }) {
+function NoPackagePopup({ setShowNotifyNoPackage, type }) {
   const navigate = useNavigate();
   const handleClickPurchase = () => {
     navigate("/convert-business");
@@ -19,8 +19,8 @@ function NoPackagePopup({ setShowNotifyNoPackage }) {
         </div>
         <div className={cx("no-package-notify")}>
           <div className={cx("notify")}>
-            Access to download this image requires a partnership and the
-            purchase of a package.
+            Access to {type} requires a partnership and the purchase of a
+            package.
           </div>
         </div>
         <div className={cx("no-package-action")}>

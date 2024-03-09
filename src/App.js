@@ -9,6 +9,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { AuthProvider } from "./contexts/AuthContext";
+import { PackageProvider } from "./contexts/PackageContext";
 import { publicRoutes } from "~/routes";
 
 import Explore from "./pages/Explore";
@@ -36,60 +37,62 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className="App">
-          <ToastContainer />
-          <Routes>
-            {publicRoutes.map((route, index) => {
-              let Page = route.component;
+      <PackageProvider>
+        <Router>
+          <div className="App">
+            <ToastContainer />
+            <Routes>
+              {publicRoutes.map((route, index) => {
+                let Page = route.component;
 
-              if (route.path === "/") {
+                if (route.path === "/") {
+                  return (
+                    <Route
+                      key={index}
+                      path={route.path}
+                      element={
+                        isLoggedIn ? (
+                          <Home onLogout={handleLogout} />
+                        ) : (
+                          <LandingPage onLogin={handleLogin} />
+                        )
+                      }
+                    />
+                  );
+                } else if (route.path === "/ideas") {
+                  return (
+                    <Route
+                      key={index}
+                      path={route.path}
+                      element={
+                        isLoggedIn ? (
+                          <Home onLogout={handleLogout} />
+                        ) : (
+                          <Explore onLogin={handleLogin} />
+                        )
+                      }
+                    />
+                  );
+                }
+
                 return (
                   <Route
                     key={index}
                     path={route.path}
                     element={
                       isLoggedIn ? (
-                        <Home onLogout={handleLogout} />
+                        <Page onLogout={handleLogout} />
                       ) : (
-                        <LandingPage onLogin={handleLogin} />
+                        <Navigate to="/" />
                       )
                     }
                   />
                 );
-              } else if (route.path === "/ideas") {
-                return (
-                  <Route
-                    key={index}
-                    path={route.path}
-                    element={
-                      isLoggedIn ? (
-                        <Home onLogout={handleLogout} />
-                      ) : (
-                        <Explore onLogin={handleLogin} />
-                      )
-                    }
-                  />
-                );
-              }
-
-              return (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={
-                    isLoggedIn ? (
-                      <Page onLogout={handleLogout} />
-                    ) : (
-                      <Navigate to="/" />
-                    )
-                  }
-                />
-              );
-            })}
-          </Routes>
-        </div>
-      </Router>
+              })}
+            </Routes>
+          </div>
+        </Router>
+      </PackageProvider>
     </AuthProvider>
   );
 }

@@ -4,18 +4,17 @@ import { useContext, useEffect, useState } from "react";
 
 import { fetchPinInformationById } from "~/services/artService";
 import { AuthContext } from "~/contexts/AuthContext";
-import { fetchFeatureByUserId } from "~/services/packageService";
 
 import MainHeader from "~/layouts/MainHeader";
 import PinDetail from "~/components/Pin/PinDetail";
 // import PinRelated from "~/components/Pin/PinRelated";
 import ReportPin from "~/components/Pin/PinDetail/Top/MoreOptionsPin/ReportPin";
-
-import styles from "./Pin.module.scss";
+import LoadingSpinner from "~/components/LoadingSpinner";
 import NoPackagePopup from "~/components/Popup/NoPackagePopup";
 import ExtendPackagePopup from "~/components/Popup/ExtendPackagePopup";
 import UpgradePackagePopup from "~/components/Popup/UpgradePackagePopup";
 
+import styles from "./Pin.module.scss";
 const cx = classNames.bind(styles);
 function Pin({ onLogout }) {
   const location = useLocation();
@@ -23,13 +22,14 @@ function Pin({ onLogout }) {
   const { userData } = useContext(AuthContext);
 
   const [pinInformation, setPinInformation] = useState();
-  const [feature, setFeature] = useState();
-
+  const [packageType, setPackageType] = useState("download count");
+  const [packageDescType, setPackageDescType] = useState("downloading images");
   const [showReportPin, setShowReportPin] = useState(false);
   const [showNotifyNoPackage, setShowNotifyNoPackage] = useState(false);
   const [showNotifyUpgradePackage, setShowNotifyUpgradePackage] =
     useState(false);
   const [showUpgradePackage, setShowUpgradePackage] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [loadingShowPinInformation, setLoadingShowPinInformation] =
     useState(false);
 
@@ -39,7 +39,7 @@ function Pin({ onLogout }) {
 
   useEffect(() => {
     setLoadingShowPinInformation(true);
-    if (userData._id) {
+    if (id) {
       const fetchData = async () => {
         try {
           const pinData = await fetchPinInformationById(id);
@@ -52,23 +52,12 @@ function Pin({ onLogout }) {
       };
 
       fetchData();
-
-      // Fetch feature data only when userData._id changes
-      const fetchFeatureData = async () => {
-        try {
-          const featureData = await fetchFeatureByUserId(userData._id);
-          setFeature(featureData);
-        } catch (error) {
-          console.error("Error fetching feature information:", error);
-        }
-      };
-
-      fetchFeatureData();
     }
-  }, [id, userData._id]);
+  }, [id]);
 
   return (
     <>
+      {loading && <LoadingSpinner loading={loading} />}
       {showReportPin && (
         <ReportPin
           userData={userData}
@@ -77,16 +66,24 @@ function Pin({ onLogout }) {
         />
       )}
       {showNotifyNoPackage && (
-        <NoPackagePopup setShowNotifyNoPackage={setShowNotifyNoPackage} />
+        <NoPackagePopup
+          setShowNotifyNoPackage={setShowNotifyNoPackage}
+          type={"download this image"}
+        />
       )}
       {showNotifyUpgradePackage && (
         <ExtendPackagePopup
           setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
           setShowUpgradePackage={setShowUpgradePackage}
+          type={packageType}
+          descType={packageDescType}
         />
       )}
       {showUpgradePackage && (
-        <UpgradePackagePopup setShowUpgradePackage={setShowUpgradePackage} />
+        <UpgradePackagePopup
+          setShowUpgradePackage={setShowUpgradePackage}
+          setLoading={setLoading}
+        />
       )}
       <div className={cx("pin-wrapper")}>
         <MainHeader onLogout={onLogout} />
@@ -98,9 +95,9 @@ function Pin({ onLogout }) {
               setShowNotifyNoPackage={setShowNotifyNoPackage}
               setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
               pinInformation={pinInformation}
-              feature={feature && feature}
-              setFeature={setFeature}
               loadingShowPinInformation={loadingShowPinInformation}
+              setPackageType={setPackageType}
+              setPackageDescType={setPackageDescType}
             />
           </div>
           <div className={cx("pin-related-main")}>{/* <PinRelated /> */}</div>

@@ -1,5 +1,5 @@
 import classNames from "classnames/bind";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import api from "~/services/apiService";
 import { fetchGetAllArtIDsForUser } from "~/services/saveArtService";
@@ -8,17 +8,19 @@ import MoreOptionsPin from "./MoreOptionsPin";
 import SharingPin from "./SharingPin";
 
 import styles from "./Top.module.scss";
+import { PackageContext } from "~/contexts/PackageContext";
 const cx = classNames.bind(styles);
 
 function Top({
   userData,
   pinInformation,
-  feature,
-  setFeature,
   setShowReportPin,
   setShowNotifyNoPackage,
   setShowNotifyUpgradePackage,
+  setPackageType,
+  setPackageDescType,
 }) {
+  const { feature } = useContext(PackageContext);
   const [saved, setSaved] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [showShare, setShowShare] = useState(false);
@@ -41,23 +43,30 @@ function Top({
     fetchData();
   }, [pinInformation._id, userData._id]);
 
-  const handleSavePin = async (e) => {
-    e.stopPropagation();
-    const saveArtworkData = {
-      userID: userData._id,
-      artID: pinInformation._id,
-    };
-    try {
-      await api.post(`/save/saveArtwork`, saveArtworkData);
-      const saveList = await fetchGetAllArtIDsForUser(userData._id);
-      const filteredSaveData = saveList.filter(
-        (user) => user === pinInformation._id
-      );
-      if (filteredSaveData.length > 0) {
-        setSaved(true);
+  const handleSavePin = async () => {
+    if (!userData.packageId) {
+      setShowNotifyNoPackage(true);
+    } else if (feature.countSave < 1) {
+      setShowNotifyUpgradePackage(true);
+      setPackageType("save count for this artwork");
+      setPackageDescType("saving artwork");
+    } else {
+      const saveArtworkData = {
+        userID: userData._id,
+        artID: pinInformation._id,
+      };
+      try {
+        await api.post(`/save/saveArtwork`, saveArtworkData);
+        const saveList = await fetchGetAllArtIDsForUser(userData._id);
+        const filteredSaveData = saveList.filter(
+          (user) => user === pinInformation._id
+        );
+        if (filteredSaveData.length > 0) {
+          setSaved(true);
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
     }
   };
   return (
@@ -111,8 +120,6 @@ function Top({
           <MoreOptionsPin
             userData={userData}
             pinInformation={pinInformation}
-            feature={feature && feature}
-            setFeature={setFeature}
             setShowReportPin={setShowReportPin}
             setShowNotifyNoPackage={setShowNotifyNoPackage}
             setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}

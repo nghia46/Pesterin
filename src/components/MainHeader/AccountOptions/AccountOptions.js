@@ -1,5 +1,5 @@
 import classNames from "classnames/bind";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { AuthContext } from "~/contexts/AuthContext";
@@ -8,6 +8,8 @@ import TokenService from "~/services/tokenService";
 
 import UserDefaultImg from "~/assets/images/user-default.png";
 import styles from "./AccountOptions.module.scss";
+import PackageFeature from "./PackageFeature";
+import { PackageContext } from "~/contexts/PackageContext";
 const cx = classNames.bind(styles);
 const yourAccount = [{ id: 1, text: "Add account", path: "/add-account" }];
 
@@ -63,6 +65,8 @@ const moreOptions = [
 ];
 function AccountOptions({ onLogout, packageName }) {
   const { userData, logout } = useContext(AuthContext);
+  const { setFeature } = useContext(PackageContext);
+  const [showPackageFeature, setShowPackageFeature] = useState(false);
 
   const handleLogout = () => {
     const refreshToken = TokenService.getRefreshToken();
@@ -70,6 +74,7 @@ function AccountOptions({ onLogout, packageName }) {
       .post("/auth/logout", { refreshToken })
       .then((res) => {
         TokenService.removeTokens();
+        setFeature(null);
         logout();
         onLogout();
       })
@@ -95,7 +100,9 @@ function AccountOptions({ onLogout, packageName }) {
               <div className={cx("user-info")}>
                 <div className={cx("username")}>
                   <span className={cx("text")}>
-                    {userData.firstName + " " + userData.lastName.split(" ")[0]}
+                    {userData.lastName
+                      ? userData.lastName.split(" ")[0] + " "
+                      : userData.firstName.split(" ")[0] + " "}
                   </span>
                   {packageName && (
                     <span className={cx("type-package")}>
@@ -130,6 +137,29 @@ function AccountOptions({ onLogout, packageName }) {
             </div>
           </Link>
         )}
+
+        {packageName && (
+          <div
+            className={
+              showPackageFeature
+                ? cx(
+                    "account-item-wrapper-package",
+                    "account-item-wrapper-package-open"
+                  )
+                : cx("account-item-wrapper-package")
+            }
+            onClick={() => setShowPackageFeature(!showPackageFeature)}
+          >
+            <div className={cx("account-item-container-package")}>
+              <div className={cx("text")}>Package feature</div>
+              <div className={cx("dropdown")}>
+                <i className={cx("fa-solid fa-chevron-up", "icon")}></i>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {packageName && showPackageFeature && <PackageFeature />}
 
         {/* More options */}
         <div className={cx("more-options-text")}>More options</div>

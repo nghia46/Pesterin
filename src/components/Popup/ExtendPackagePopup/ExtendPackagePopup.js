@@ -5,6 +5,8 @@ const cx = classNames.bind(styles);
 function ExtendPackagePopup({
   setShowNotifyUpgradePackage,
   setShowUpgradePackage,
+  type,
+  descType,
 }) {
   const handleClickUpgrade = () => {
     setShowNotifyUpgradePackage(false);
@@ -20,8 +22,8 @@ function ExtendPackagePopup({
         </div>
         <div className={cx("no-package-notify")}>
           <div className={cx("notify")}>
-            Your downloads have exceeded the limit. Upgrade your package to
-            continue downloading images.
+            Your <span className={cx("highlight")}>{type}</span> have exceeded
+            the limit. Upgrade your package to continue {descType}.
           </div>
         </div>
         <div className={cx("no-package-action")}>

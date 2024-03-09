@@ -3,16 +3,18 @@ import { ref, getDownloadURL } from "firebase/storage";
 import { storage } from "~/configs/firebase";
 import { fetchDecreaseDownloadCount } from "~/services/packageService";
 import styles from "./MoreOptionsPin.module.scss";
+import { useContext } from "react";
+import { PackageContext } from "~/contexts/PackageContext";
 const cx = classNames.bind(styles);
 function MoreOptionsPin({
   userData,
   pinInformation,
-  feature,
-  setFeature,
   setShowReportPin,
   setShowNotifyNoPackage,
   setShowNotifyUpgradePackage,
 }) {
+  const { feature, setFeature } = useContext(PackageContext);
+
   const handleDownloadImage = () => {
     if (!userData.packageId) {
       setShowNotifyNoPackage(true);
@@ -28,7 +30,7 @@ function MoreOptionsPin({
             const blob = xhr.response;
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `downloaded_artwork_${pinInformation._id}.jpg`;
+            link.download = `${pinInformation._id}.jpg`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -44,15 +46,14 @@ function MoreOptionsPin({
         });
     }
   };
-
   const callApiDownloadImage = async () => {
     try {
-      const feature = await fetchDecreaseDownloadCount(
+      const featureResponse = await fetchDecreaseDownloadCount(
         userData._id,
         userData.packageId
       );
 
-      setFeature(feature);
+      setFeature(featureResponse);
     } catch (error) {
       console.error(error);
     }

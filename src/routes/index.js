@@ -7,7 +7,7 @@ import Profile from "~/pages/Profile";
 import Creator from "~/pages/Creator";
 import SearchPins from "~/pages/SearchPins";
 import Business from "~/pages/Business";
-import UpgradePackagePopup from "~/components/Popup/UpgradePackagePopup";
+import PackageFeature from "~/components/MainHeader/AccountOptions/PackageFeature";
 const publicRoutes = [
   { path: "/", component: Home },
   { path: "/", component: LandingPage },
@@ -18,7 +18,7 @@ const publicRoutes = [
   { path: "/creator/:id", component: Creator },
   { path: "/search/pins", component: SearchPins },
   { path: "/convert-business", component: Business },
-  { path: "/page", component: UpgradePackagePopup },
+  { path: "/page", component: PackageFeature },
 ];
 
 export { publicRoutes };

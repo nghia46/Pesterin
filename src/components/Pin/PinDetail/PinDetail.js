@@ -1,5 +1,5 @@
 import classNames from "classnames/bind";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Watermark } from "antd";
 import Bottom from "./Bottom";
 import Middle from "./Middle";
@@ -7,6 +7,7 @@ import Top from "./Top";
 
 import { ClipLoader } from "react-spinners";
 import styles from "./PinDetail.module.scss";
+import { PackageContext } from "~/contexts/PackageContext";
 const cx = classNames.bind(styles);
 
 function PinDetail({
@@ -15,10 +16,11 @@ function PinDetail({
   setShowNotifyNoPackage,
   setShowNotifyUpgradePackage,
   pinInformation,
-  feature,
-  setFeature,
   loadingShowPinInformation,
+  setPackageType,
+  setPackageDescType,
 }) {
+  const { feature } = useContext(PackageContext);
   const [listComments, setListComments] = useState([]);
   const [countComment, setCountComment] = useState(0);
   const [loadingShowListComment, setLoadingShowListComment] = useState(false);
@@ -52,7 +54,7 @@ function PinDetail({
                   color: "#e9e9e9",
                   fontSize: 20,
                 }}
-                zIndex={10}
+                zIndex={2}
                 gap={[60, 70]}
               >
                 <img
@@ -80,11 +82,11 @@ function PinDetail({
               <Top
                 userData={userData}
                 pinInformation={pinInformation}
-                feature={feature && feature}
-                setFeature={setFeature}
                 setShowReportPin={setShowReportPin}
                 setShowNotifyNoPackage={setShowNotifyNoPackage}
                 setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
+                setPackageType={setPackageType}
+                setPackageDescType={setPackageDescType}
               />
               {/* Middle */}
               <Middle

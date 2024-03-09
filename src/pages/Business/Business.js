@@ -16,8 +16,8 @@ import LoadingSpinner from "~/components/LoadingSpinner";
 import styles from "./Business.module.scss";
 const cx = classNames.bind(styles);
 function Business({ onLogout }) {
-  const [loading, setLoading] = useState(false);
   const { userData } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const handleTryFree = () => {
     setLoading(true);
     const packageFreeData = {
@@ -51,7 +51,7 @@ function Business({ onLogout }) {
         .then((response) => {
           const vnpUrl = response.data;
           setLoading(false);
-          window.open(vnpUrl, "_blank");
+          window.location.href = vnpUrl;
         })
         .catch((error) => {
           console.log(error);
@@ -72,7 +72,7 @@ function Business({ onLogout }) {
         .then((response) => {
           const vnpUrl = response.data;
           setLoading(false);
-          window.open(vnpUrl, "_blank");
+          window.location.href = vnpUrl;
         })
         .catch((error) => {
           console.log(error);

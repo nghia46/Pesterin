@@ -11,7 +11,7 @@ import {
 
 import Logo from "~/assets/images/logo.png";
 import UserDefaultImg from "~/assets/images/user-default.png";
-import AccountOptions from "~/components/AccountOptions";
+import AccountOptions from "~/components/MainHeader/AccountOptions";
 import Notifications from "~/components/Notifications";
 
 import styles from "./HeaderNoSearch.module.scss";

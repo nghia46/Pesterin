@@ -1,12 +1,58 @@
-import React from "react";
 import classNames from "classnames/bind";
+import { useContext } from "react";
+import { AuthContext } from "~/contexts/AuthContext";
 import {
   businessPackageDatas,
   enterprisePackageDatas,
 } from "~/datas/packageDatas";
+import api from "~/services/apiService";
+import { convertUSDToVND } from "~/utils/convertToUSD";
 import styles from "./UpgradePackagePopup.module.scss";
 const cx = classNames.bind(styles);
-function UpgradePackagePopup({ setShowUpgradePackage }) {
+function UpgradePackagePopup({ setShowUpgradePackage, setLoading }) {
+  const { userData } = useContext(AuthContext);
+
+  const handleBusinessPayment = async () => {
+    setLoading(true);
+    const vndAmount = convertUSDToVND(businessPackageDatas.price, 24675);
+    try {
+      api
+        .get(
+          `/payment/create_payment_url_upgrade/${vndAmount}/${userData._id}/${businessPackageDatas.type}`
+        )
+        .then((response) => {
+          const vnpUrl = response.data;
+          setLoading(false);
+          window.location.href = vnpUrl;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleEnterprisePayment = () => {
+    setLoading(true);
+    const vndAmount = convertUSDToVND(enterprisePackageDatas.price, 24675);
+    try {
+      api
+        .get(
+          `/payment/create_payment_url_upgrade/${vndAmount}/${userData._id}/${enterprisePackageDatas.type}`
+        )
+        .then((response) => {
+          const vnpUrl = response.data;
+          setLoading(false);
+          window.location.href = vnpUrl;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className={cx("upgrade-package-wrapper")}>
       <div className={cx("upgrade-package-container")}>
@@ -60,7 +106,12 @@ function UpgradePackagePopup({ setShowUpgradePackage }) {
                   )}
                 </div>
                 <div className={cx("action-container")}>
-                  <button className={cx("action-btn")}>Get started</button>
+                  <button
+                    className={cx("action-btn")}
+                    onClick={handleBusinessPayment}
+                  >
+                    Get started
+                  </button>
                 </div>
               </div>
               <div className={cx("package-item")}>
@@ -91,7 +142,12 @@ function UpgradePackagePopup({ setShowUpgradePackage }) {
                   )}
                 </div>
                 <div className={cx("action-container")}>
-                  <button className={cx("action-btn")}>Get started</button>
+                  <button
+                    className={cx("action-btn")}
+                    onClick={handleEnterprisePayment}
+                  >
+                    Get started
+                  </button>
                 </div>
               </div>
             </div>
