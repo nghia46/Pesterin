@@ -15,6 +15,7 @@ function PinDetail({
   setShowReportPin,
   setShowNotifyNoPackage,
   setShowNotifyUpgradePackage,
+  setShowPrivate,
   pinInformation,
   loadingShowPinInformation,
   setPackageType,
@@ -85,6 +86,7 @@ function PinDetail({
                 setShowReportPin={setShowReportPin}
                 setShowNotifyNoPackage={setShowNotifyNoPackage}
                 setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
+                setShowPrivate={setShowPrivate}
                 setPackageType={setPackageType}
                 setPackageDescType={setPackageDescType}
               />

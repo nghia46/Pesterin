@@ -17,6 +17,7 @@ function Top({
   setShowReportPin,
   setShowNotifyNoPackage,
   setShowNotifyUpgradePackage,
+  setShowPrivate,
   setPackageType,
   setPackageDescType,
 }) {
@@ -26,21 +27,23 @@ function Top({
   const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const saveList = await fetchGetAllArtIDsForUser(userData._id);
-        const filteredSaveData = saveList.filter(
-          (user) => user === pinInformation._id
-        );
-        if (filteredSaveData.length > 0) {
-          setSaved(true);
+    if (userData._id) {
+      const fetchData = async () => {
+        try {
+          const saveList = await fetchGetAllArtIDsForUser(userData._id);
+          const filteredSaveData = saveList.filter(
+            (user) => user === pinInformation._id
+          );
+          if (filteredSaveData.length > 0) {
+            setSaved(true);
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+      };
 
-    fetchData();
+      fetchData();
+    }
   }, [pinInformation._id, userData._id]);
 
   const handleSavePin = async () => {
@@ -123,6 +126,7 @@ function Top({
             setShowReportPin={setShowReportPin}
             setShowNotifyNoPackage={setShowNotifyNoPackage}
             setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
+            setShowPrivate={setShowPrivate}
           />
         )}
         {showShare && <SharingPin />}

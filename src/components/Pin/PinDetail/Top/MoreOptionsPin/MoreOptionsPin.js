@@ -12,11 +12,14 @@ function MoreOptionsPin({
   setShowReportPin,
   setShowNotifyNoPackage,
   setShowNotifyUpgradePackage,
+  setShowPrivate,
 }) {
   const { feature, setFeature } = useContext(PackageContext);
 
   const handleDownloadImage = () => {
-    if (!userData.packageId) {
+    if (pinInformation.access === "private") {
+      setShowPrivate(true);
+    } else if (!userData.packageId) {
       setShowNotifyNoPackage(true);
     } else if (feature.countDownload < 1) {
       setShowNotifyUpgradePackage(true);
@@ -61,9 +64,12 @@ function MoreOptionsPin({
   return (
     <div className={cx("more-options-wrapper")}>
       <div className={cx("more-options-container")}>
-        <div className={cx("download")} onClick={handleDownloadImage}>
-          <div className={cx("text")}>Download image</div>
-        </div>
+        {pinInformation.userId !== userData._id && (
+          <div className={cx("download")} onClick={handleDownloadImage}>
+            <div className={cx("text")}>Download image</div>
+          </div>
+        )}
+
         <div className={cx("hide")}>
           <div className={cx("text")}>Hide Pin</div>
         </div>

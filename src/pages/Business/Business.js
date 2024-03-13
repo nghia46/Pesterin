@@ -2,17 +2,17 @@ import classNames from "classnames/bind";
 import { useContext, useState } from "react";
 
 import { AuthContext } from "~/contexts/AuthContext";
-import api from "~/services/apiService";
 import {
-  freePackageDatas,
   businessPackageDatas,
   enterprisePackageDatas,
+  freePackageDatas,
 } from "~/datas/packageDatas";
+import api from "~/services/apiService";
 import { convertUSDToVND } from "~/utils/convertToUSD";
 
-import HeaderNoSearch from "~/layouts/HeaderNoSearch";
 import LoadingSpinner from "~/components/LoadingSpinner";
 
+import MainHeader from "~/layouts/MainHeader";
 import styles from "./Business.module.scss";
 const cx = classNames.bind(styles);
 function Business({ onLogout }) {
@@ -85,7 +85,7 @@ function Business({ onLogout }) {
     <>
       {loading && <LoadingSpinner loading={loading} />}
       <div className={cx("business-wrapper")}>
-        <HeaderNoSearch onLogout={onLogout} />
+        <MainHeader onLogout={onLogout} type="NoSearch" />
         <div className={cx("business-container")}>
           <div className={cx("package-container")}>
             <div className={cx("package-introduction")}>

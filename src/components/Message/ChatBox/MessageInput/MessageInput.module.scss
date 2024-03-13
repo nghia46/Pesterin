@@ -1,0 +1,78 @@
+.message-box-footer {
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: fit-content;
+  padding: 12px;
+  .option-input {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .image,
+    .video,
+    .plus,
+    .gif {
+      margin-right: 15px;
+
+      .icon {
+        cursor: pointer;
+        font-size: 20px;
+        color: var(--primary);
+      }
+    }
+  }
+
+  .text-input {
+    flex: 1;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 20px;
+    background-color: #f0f2f5;
+
+    .input-chat {
+      width: 95%;
+      padding: 8px 12px;
+      font-size: 14px;
+      border: none;
+      outline: none;
+      overflow: hidden;
+      color: #333;
+      background-color: transparent;
+    }
+
+    .emoji {
+      width: 5%;
+      display: flex;
+      align-content: center;
+      justify-content: center;
+
+      .icon-emoji {
+        cursor: pointer;
+        font-size: 20px;
+        color: var(--primary);
+      }
+    }
+  }
+
+  .send-chat {
+    width: fit-content;
+    margin-left: 15px;
+
+    .icon-send {
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .icon-send-active {
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--primary);
+    }
+  }
+}

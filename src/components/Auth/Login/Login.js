@@ -7,16 +7,24 @@ import { jwtDecode } from "jwt-decode";
 
 import api from "~/services/apiService";
 import { encryptUserId } from "~/utils/hashUserId";
+import { AuthContext } from "~/contexts/AuthContext";
+import { PackageContext } from "~/contexts/PackageContext";
+import { fetchFeatureByUserId } from "~/services/packageService";
+import { fetchGetConversation } from "~/services/conversationService";
+
 import TokenService from "~/services/tokenService";
 import LoadingSpinner from "~/components/LoadingSpinner";
-import { AuthContext } from "~/contexts/AuthContext";
 
 import Logo from "~/assets/images/logo.png";
 import googleIcon from "~/assets/images/googleIcon.png";
 import styles from "./Login.module.scss";
+import { MessageContext } from "~/contexts/MessageContext";
+
 const cx = classNames.bind(styles);
 function Login({ setShowLogin, setShowSignup, onLogin }) {
   const { setUserId } = useContext(AuthContext);
+  const { setFeature } = useContext(PackageContext);
+  const { setConversations } = useContext(MessageContext);
   const [googleInfo, setGoogleInfo] = useState(null);
   const [loginData, setLoginData] = useState({
     email: null,
@@ -44,32 +52,35 @@ function Login({ setShowLogin, setShowSignup, onLogin }) {
             },
           }
         )
-        .then((res) => {
+        .then(async (res) => {
+          // Make the callback function async
           const userData = res.data;
-          api
-            .post("/auth/google", userData)
-            .then((response) => {
-              const accessToken = response.data.accessToken;
-              const refreshToken = response.data.refreshToken;
-              TokenService.setAccessToken(accessToken);
-              TokenService.setRefreshToken(refreshToken);
-              const decodeAccessToken = jwtDecode(accessToken);
-              const userId = decodeAccessToken.userId;
-              const encodeUserId = encryptUserId(
-                userId,
-                process.env.REACT_APP_SECRET_KEY_ENCODE
-              );
-              setUserId(encodeUserId);
-              setLoading(false);
-              onLogin();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          try {
+            const response = await api.post("/auth/google", userData);
+            const accessToken = response.data.accessToken;
+            const refreshToken = response.data.refreshToken;
+            TokenService.setAccessToken(accessToken);
+            TokenService.setRefreshToken(refreshToken);
+            const decodeAccessToken = jwtDecode(accessToken);
+            const userId = decodeAccessToken.userId;
+            const encodeUserId = encryptUserId(
+              userId,
+              process.env.REACT_APP_SECRET_KEY_ENCODE
+            );
+            setUserId(encodeUserId);
+            const feature = await fetchFeatureByUserId(userId);
+            setFeature(feature);
+            const conversations = await fetchGetConversation(userId);
+            setConversations(conversations);
+            setLoading(false);
+            onLogin();
+          } catch (error) {
+            console.log(error);
+          }
         })
         .catch((err) => console.log(err));
     }
-  }, [googleInfo, onLogin, setUserId]);
+  }, [googleInfo, onLogin, setConversations, setFeature, setUserId]);
 
   const handleChangeEmail = (e) => {
     setLoginData({ ...loginData, email: e.target.value });
@@ -83,20 +94,28 @@ function Login({ setShowLogin, setShowSignup, onLogin }) {
     setLoading(true);
     api
       .post("/auth/login", loginData)
-      .then((response) => {
-        const accessToken = response.data.accessToken;
-        const refreshToken = response.data.refreshToken;
-        TokenService.setAccessToken(accessToken);
-        TokenService.setRefreshToken(refreshToken);
-        const decodeAccessToken = jwtDecode(accessToken);
-        const userId = decodeAccessToken.userId;
-        const encodeUserId = encryptUserId(
-          userId,
-          process.env.REACT_APP_SECRET_KEY_ENCODE
-        );
-        setUserId(encodeUserId);
-        setLoading(false);
-        onLogin();
+      .then(async (response) => {
+        try {
+          const accessToken = response.data.accessToken;
+          const refreshToken = response.data.refreshToken;
+          TokenService.setAccessToken(accessToken);
+          TokenService.setRefreshToken(refreshToken);
+          const decodeAccessToken = jwtDecode(accessToken);
+          const userId = decodeAccessToken.userId;
+          const encodeUserId = encryptUserId(
+            userId,
+            process.env.REACT_APP_SECRET_KEY_ENCODE
+          );
+          setUserId(encodeUserId);
+          const feature = await fetchFeatureByUserId(userId);
+          setFeature(feature);
+          const conversations = await fetchGetConversation(userId);
+          setConversations(conversations);
+          setLoading(false);
+          onLogin();
+        } catch (error) {
+          console.log(error);
+        }
       })
       .catch((error) => {
         setLoading(false);

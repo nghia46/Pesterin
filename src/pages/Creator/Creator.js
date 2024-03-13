@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 import api from "~/services/apiService";
@@ -16,10 +16,13 @@ import ProfileOptions from "~/components/Creator/ProfileOptions";
 import ReportAccount from "~/components/Creator/ProfileOptions/ReportAccount";
 
 import styles from "./Creator.module.scss";
+import { MessageContext } from "~/contexts/MessageContext";
 const cx = classNames.bind(styles);
 function Creator({ onLogout }) {
   const { userData } = useContext(AuthContext);
+  const { setConversations } = useContext(MessageContext);
   const { id } = useParams();
+  const navigate = useNavigate();
   const [creator, setCreator] = useState();
   const [following, setFollowing] = useState([]);
   const [countFollowing, setCountFollowing] = useState(0);
@@ -74,6 +77,49 @@ function Creator({ onLogout }) {
       // Additional logic if needed after the follow operation
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleUnFollow = async () => {
+    try {
+      await api.delete(`/follow/deleteFollow/${userData._id}/${creator._id}`);
+
+      // Fetch following data only if creatorData is available
+      const followingList = await fetchGetFollowing(userData._id);
+      const filteredUserData = followingList.filter(
+        (user) => user === creator._id
+      );
+      setFollowing(filteredUserData);
+
+      // Fetch follower data only if creatorData is available
+      const followerList = await fetchGetFollower(creator._id);
+      setCountFollower(followerList.length);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleContact = async () => {
+    try {
+      const senderId = userData._id;
+      const receiverId = creator._id;
+
+      const conversationData = {
+        senderId,
+        receiverId,
+      };
+
+      const conversationResponse = await api.post(
+        "/conversation/newConversation",
+        conversationData
+      );
+      const conversationId = conversationResponse.data.conversation._id;
+      const updatedConversations = conversationResponse.data.conversations;
+      setConversations(updatedConversations);
+      navigate(`/messages/${conversationId}`);
+      // window.location.reload();
+    } catch (error) {
+      console.log(error);
     }
   };
   return (
@@ -169,9 +215,20 @@ function Creator({ onLogout }) {
                       ></i>
                     </div>
                     {showSharing && <SharingPin />}
+                    <div className={cx("contact")}>
+                      <button
+                        className={cx("contact-btn")}
+                        onClick={handleContact}
+                      >
+                        Contact
+                      </button>
+                    </div>
                     {following.length > 0 ? (
                       <div className={cx("following")}>
-                        <button className={cx("following-btn")}>
+                        <button
+                          className={cx("following-btn")}
+                          onClick={handleUnFollow}
+                        >
                           Following
                         </button>
                       </div>

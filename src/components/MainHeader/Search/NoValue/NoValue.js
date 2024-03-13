@@ -1,5 +1,6 @@
 import React from "react";
 import classNames from "classnames/bind";
+import { ideasForYou, popular } from "~/datas/noValueSearchDatas";
 import styles from "./NoValue.module.scss";
 const cx = classNames.bind(styles);
 
@@ -11,86 +12,14 @@ function NoValue() {
       </div>
       <div className={cx("ideas-list-container")}>
         <div className={cx("ideas-list")}>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
+          {ideasForYou.map((idea) => (
+            <div className={cx("idea-item")} key={idea.id}>
+              <img src={idea.url} alt="idea-img" className={cx("idea-img")} />
+              <div className={cx("idea-information")}>
+                <span className={cx("text")}>{idea.name}</span>
+              </div>
             </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("idea-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("idea-img")}
-            />
-            <div className={cx("idea-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
       <div className={cx("popular")}>
@@ -98,86 +27,18 @@ function NoValue() {
       </div>
       <div className={cx("popular-list-container")}>
         <div className={cx("popular-list")}>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
+          {popular.map((item) => (
+            <div className={cx("popular-item")} key={item.id}>
+              <img
+                src={item.url}
+                alt="idea-img"
+                className={cx("popular-img")}
+              />
+              <div className={cx("popular-information")}>
+                <span className={cx("text")}>{item.name}</span>
+              </div>
             </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
-          <div className={cx("popular-item")}>
-            <img
-              src="https://i.pinimg.com/236x/dd/e9/5c/dde95cfb03f1ac85f8cbb50916140997.jpg"
-              alt="idea-img"
-              className={cx("popular-img")}
-            />
-            <div className={cx("popular-information")}>
-              <span className={cx("text")}>Poster art</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

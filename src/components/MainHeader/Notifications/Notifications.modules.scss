@@ -3,7 +3,7 @@
   right: 0;
   top: 67px;
   width: 375px;
-  height: 670px;
+  height: 880px;
   border-radius: 15px;
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
   background-color: var(--bg-white);
@@ -165,5 +165,11 @@
         }
       }
     }
+  }
+}
+
+@media screen and (max-width: 1600px) {
+  .notification-wrapper {
+    height: 670px;
   }
 }

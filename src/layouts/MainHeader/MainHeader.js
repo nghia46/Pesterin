@@ -2,7 +2,9 @@ import classNames from "classnames/bind";
 import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import api from "~/services/apiService";
 import { AuthContext } from "~/contexts/AuthContext";
+import { MessageContext } from "~/contexts/MessageContext";
 import {
   fetchGetNotificationsForUser,
   getUnreadNotifications,
@@ -12,11 +14,11 @@ import useDebounce from "~/hooks/useDebounce";
 import Logo from "~/assets/images/logo.png";
 import UserDefaultImg from "~/assets/images/user-default.png";
 import AccountOptions from "~/components/MainHeader/AccountOptions";
-import Notifications from "~/components/Notifications";
+import Notifications from "~/components/MainHeader/Notifications";
 import Search from "~/components/MainHeader/Search";
+import MessageConversation from "~/components/MainHeader/MessageConversation";
 
 import styles from "./MainHeader.module.scss";
-import api from "~/services/apiService";
 const cx = classNames.bind(styles);
 const headerNav = [
   {
@@ -30,8 +32,9 @@ const headerNav = [
     path: "/pin-creation-tool",
   },
 ];
-function MainHeader({ onLogout }) {
+function MainHeader({ onLogout, type = "Search" }) {
   const { userData } = useContext(AuthContext);
+  const { conversations } = useContext(MessageContext);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -40,12 +43,15 @@ function MainHeader({ onLogout }) {
   const [searchResult, setSearchResult] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [countNotifications, setCountNotifications] = useState();
+  const [countMessages, setCountMessages] = useState();
   const [packageName, setPackageName] = useState("");
+  const [unseenMessages, setUnseenMessages] = useState([]);
 
   const [showSearch, setShowSearch] = useState(false);
   const [showSearchInput, setShowSearchInput] = useState(false);
   const [showAccountSetting, setShowAccountSetting] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
 
   const debouncedValue = useDebounce(searchValue, 300);
 
@@ -86,6 +92,39 @@ function MainHeader({ onLogout }) {
   }, [userData._id]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (userData._id) {
+          const responseCountMessages = await api.get(
+            `/message/getMessageUnseen/${userData._id}`
+          );
+          setCountMessages(responseCountMessages.data.length);
+        }
+      } catch (error) {
+        console.error("Error fetching notification:", error);
+      }
+    };
+
+    fetchData();
+  }, [userData._id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (userData._id) {
+          const response = await api.get(
+            `/message/getMessageUnseen/${userData._id}`
+          );
+          setUnseenMessages(response.data);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [userData._id]);
+
+  useEffect(() => {
     if (userData.packageId) {
       api
         .get(`package/getPackageName/${userData.packageId}`)
@@ -116,6 +155,10 @@ function MainHeader({ onLogout }) {
   }, [debouncedValue]);
 
   const handleNavItemClick = (path) => {
+    if (path === "/") {
+      navigate(path);
+      window.location.reload();
+    }
     navigate(path);
   };
 
@@ -135,7 +178,13 @@ function MainHeader({ onLogout }) {
     }
   };
   return (
-    <div className={cx("main-header-wrapper")}>
+    <div
+      className={
+        type !== "NoSearch"
+          ? cx("main-header-wrapper")
+          : cx("main-header-wrapper", "no-search")
+      }
+    >
       {showAccountSetting && (
         <AccountOptions onLogout={onLogout} packageName={packageName} />
       )}
@@ -146,6 +195,14 @@ function MainHeader({ onLogout }) {
           setNotifications={setNotifications}
           setCountNotifications={setCountNotifications}
           setShowNotifications={setShowNotifications}
+        />
+      )}
+      {showMessage && (
+        <MessageConversation
+          userData={userData}
+          conversations={conversations}
+          setShowMessage={setShowMessage}
+          unseenMessages={unseenMessages}
         />
       )}
       <div className={cx("main-header-container")}>
@@ -171,51 +228,57 @@ function MainHeader({ onLogout }) {
             })}
           </div>
         </div>
-        <div className={cx("header-middle")}>
-          {showSearchInput ? (
-            <div className={cx("header-search-focus")}>
-              <input
-                type="text"
-                value={searchValue}
-                spellCheck={false}
-                autoFocus={true}
-                placeholder="Search"
-                className={cx("search-input")}
-                onChange={handleChangeSearchInput}
-              />
+        {type !== "NoSearch" && (
+          <div className={cx("header-middle")}>
+            {showSearchInput ? (
+              <div className={cx("header-search-focus")}>
+                <input
+                  type="text"
+                  value={searchValue}
+                  spellCheck={false}
+                  autoFocus={true}
+                  placeholder="Search"
+                  className={cx("search-input")}
+                  onChange={handleChangeSearchInput}
+                />
 
-              <div className={cx("close-search")}>
-                <div
-                  className={cx("icon-close")}
-                  onClick={() => {
-                    setShowSearchInput(false);
-                    setShowSearch(false);
-                  }}
-                >
-                  <i className={cx("fa-solid fa-circle-xmark", "icon")}></i>
+                <div className={cx("close-search")}>
+                  <div
+                    className={cx("icon-close")}
+                    onClick={() => {
+                      setShowSearchInput(false);
+                      setShowSearch(false);
+                    }}
+                  >
+                    <i className={cx("fa-solid fa-circle-xmark", "icon")}></i>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className={cx("header-search")} onClick={handleShowSearch}>
-              <i
-                className={cx("fa-solid fa-magnifying-glass", "search-icon")}
-              ></i>
-              <span className={cx("search-focus")}>Search</span>
-            </div>
-          )}
-          {showSearch && (
-            <Search
-              searchValue={searchValue}
-              searchResult={searchResult}
-              setShowSearch={setShowSearch}
-            />
-          )}
-        </div>
+            ) : (
+              <div className={cx("header-search")} onClick={handleShowSearch}>
+                <i
+                  className={cx("fa-solid fa-magnifying-glass", "search-icon")}
+                ></i>
+                <span className={cx("search-focus")}>Search</span>
+              </div>
+            )}
+            {showSearch && (
+              <Search
+                searchValue={searchValue}
+                searchResult={searchResult}
+                setShowSearch={setShowSearch}
+              />
+            )}
+          </div>
+        )}
+
         <div className={cx("header-right")}>
           <div
             className={cx("notification")}
-            onClick={() => setShowNotifications(!showNotifications)}
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+              setShowMessage(false);
+            }}
           >
             <i className={cx("fa-sharp fa-solid fa-bell", "icon")}></i>
             {countNotifications > 0 && (
@@ -229,12 +292,24 @@ function MainHeader({ onLogout }) {
               </div>
             )}
           </div>
-          <div className={cx("message")}>
+          <div
+            className={cx("message")}
+            onClick={() => {
+              setShowMessage(!showMessage);
+              setShowNotifications(false);
+            }}
+          >
             <i className={cx("fa-solid fa-comment-dots", "icon")}></i>
-            <div className={cx("count-message")}>
-              <div className={cx("number")}>9</div>
-              <i className={cx("fa-solid fa-plus", "plus-icon")}></i>
-            </div>
+            {countMessages > 0 && (
+              <div className={cx("count-message")}>
+                <div className={cx("number")}>
+                  {countMessages > 9 ? 9 : countMessages}
+                </div>
+                {countMessages > 9 && (
+                  <i className={cx("fa-solid fa-plus", "plus-icon")}></i>
+                )}
+              </div>
+            )}
           </div>
           <Link to="/profile" className={cx("user-image")}>
             <img

@@ -15,6 +15,7 @@ import ExtendPackagePopup from "~/components/Popup/ExtendPackagePopup";
 import UpgradePackagePopup from "~/components/Popup/UpgradePackagePopup";
 
 import styles from "./Pin.module.scss";
+import AccessPrivatePopup from "~/components/Popup/AccessPrivatePopup";
 const cx = classNames.bind(styles);
 function Pin({ onLogout }) {
   const location = useLocation();
@@ -29,6 +30,7 @@ function Pin({ onLogout }) {
   const [showNotifyUpgradePackage, setShowNotifyUpgradePackage] =
     useState(false);
   const [showUpgradePackage, setShowUpgradePackage] = useState(false);
+  const [showAccessPrivate, setShowAccessPrivate] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingShowPinInformation, setLoadingShowPinInformation] =
     useState(false);
@@ -85,6 +87,13 @@ function Pin({ onLogout }) {
           setLoading={setLoading}
         />
       )}
+      {showAccessPrivate && (
+        <AccessPrivatePopup
+          userData={userData}
+          pinInformation={pinInformation}
+          setShowAccessPrivate={setShowAccessPrivate}
+        />
+      )}
       <div className={cx("pin-wrapper")}>
         <MainHeader onLogout={onLogout} />
         <div className={cx("pin-container")}>
@@ -94,6 +103,7 @@ function Pin({ onLogout }) {
               setShowReportPin={setShowReportPin}
               setShowNotifyNoPackage={setShowNotifyNoPackage}
               setShowNotifyUpgradePackage={setShowNotifyUpgradePackage}
+              setShowPrivate={setShowAccessPrivate}
               pinInformation={pinInformation}
               loadingShowPinInformation={loadingShowPinInformation}
               setPackageType={setPackageType}
