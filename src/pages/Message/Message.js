@@ -29,7 +29,7 @@ function Message({ onLogout }) {
   const [currentChat, setCurrentChat] = useState(null);
 
   useEffect(() => {
-    socket.current = io("http://localhost:5000");
+    socket.current = io("https://asp-server-pesterin-production.up.railway.app");
     socket.current.on("getMessage", (data) => {
       setArrivalMessages({
         senderId: data.senderId,
